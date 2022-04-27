@@ -25,8 +25,8 @@ mod evaluator;
 mod tokenizer;
 
 pub fn evaluate(expression: &String) -> Result<f64, String> {
-    match tokenizer::tokenize(expression.as_str()) {
-        Ok(_tokens) => return Ok(43.0),
-        Err(str_error) => return Err(str_error),
-    }
+    let _postfix_token: Vec<token::Token> =
+        evaluator::infix_to_postfix(&tokenizer::tokenize(expression.as_str())?)?;
+
+    return Ok(43.0);
 }

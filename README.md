@@ -1,5 +1,6 @@
 # Taz
-Taz is Rust library to evaluate a mathematical expression
+Taz is Rust library to evaluate a mathematical expression.
+
 For example we can evaluate the following expression:
 - *1 + 1*
 - *2.0 * (4.43 - 5.99) / 3.0*

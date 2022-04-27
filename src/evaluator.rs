@@ -22,7 +22,7 @@ use super::token::Token;
 /// Convert vector of token corresponding to infix representation of expression
 /// to vector of token corresponding to postfix representation
 #[allow(dead_code)]
-fn infix_to_postfix(tokens: &Vec<Token>) -> Result<Vec<Token>, String> {
+pub fn infix_to_postfix(tokens: &Vec<Token>) -> Result<Vec<Token>, String> {
     // Closure to check if last operator from stack_operator is primary to current binary operator
     let last_operator_is_primary = |token_ops: Token, current_ops: BinaryOperator| -> bool {
         match token_ops {
