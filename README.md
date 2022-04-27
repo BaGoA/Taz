@@ -1,10 +1,10 @@
 # Taz
 Taz is Rust library to evaluate a mathematical expression
-For example we can evaluate the following expression
-	*1 + 1*
-	*2.0 * (4.43 - 5.99) / 3.0*
-	*sqrt(x^2 + y^2)*
-	*cos(pi / 4.0)^2 + sin(pi / 4.0)^2*
+For example we can evaluate the following expression:
+- *1 + 1*
+- *2.0 * (4.43 - 5.99) / 3.0*
+- *sqrt(x^2 + y^2)*
+- *cos(pi / 4.0)^2 + sin(pi / 4.0)^2*
 
 ## Build
 Build of Taz core is made by [Rust](https://www.rust-lang.org/) tool [Cargo](https://doc.rust-lang.org/cargo/)
