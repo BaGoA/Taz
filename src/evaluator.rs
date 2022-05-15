@@ -164,9 +164,8 @@ pub fn postfix_evaluation(tokens: &Vec<Token>) -> Result<f64, String> {
 // Units tests
 #[cfg(test)]
 mod tests {
-    use crate::constants::PI;
-
     use super::super::constants;
+    use super::super::constants::PI;
     use super::super::functions::Function;
     use super::super::operators::UnaryOperator;
     use super::*;
