@@ -1,5 +1,6 @@
 # Taz
 Taz is Rust library to evaluate a mathematical expression.
+To do this we convert the expression in postfix expression, then we evaluate the postfix expresion using a operand stack.
 
 For example we can evaluate the following expression:
 - *1 + 1*
