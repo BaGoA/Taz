@@ -26,6 +26,10 @@ mod tokenizer;
 
 /// Evaluation of mathematical expression
 pub fn evaluate(expression: &String) -> Result<f64, String> {
+    if expression.len() == 0 {
+        return Err(String::from("The expression to evaluate is empty"));
+    }
+
     return evaluator::postfix_evaluation(&evaluator::infix_to_postfix(&tokenizer::tokenize(
         expression.as_str(),
     )?)?);
