@@ -84,11 +84,11 @@ pub fn tokenize(expression: &str) -> Result<Vec<Token>, String> {
             }
         } else if BinaryOperator::is_ops(c) || UnaryOperator::is_ops(c) {
             if tokens.is_empty() {
-                tokens.push(Token::new_unary_ops(c).unwrap());
+                tokens.push(Token::new_unary_ops(c)?);
             } else {
                 match tokens.last().unwrap() {
-                    &Token::LeftParenthesis => tokens.push(Token::new_unary_ops(c).unwrap()),
-                    _ => tokens.push(Token::new_binary_ops(c).unwrap()),
+                    &Token::LeftParenthesis => tokens.push(Token::new_unary_ops(c)?),
+                    _ => tokens.push(Token::new_binary_ops(c)?),
                 }
             }
 
@@ -103,9 +103,9 @@ pub fn tokenize(expression: &str) -> Result<Vec<Token>, String> {
             let name: String = extract_word(char_it.by_ref());
 
             if is_constant(name.as_str()) {
-                tokens.push(Token::new_constant(name.as_str()).unwrap());
+                tokens.push(Token::new_constant(name.as_str())?);
             } else if Function::is_fun(name.as_str()) {
-                tokens.push(Token::new_function(name.as_str()).unwrap());
+                tokens.push(Token::new_function(name.as_str())?);
             } else {
                 return Err(String::from("Cannot parse this expression"));
             }
