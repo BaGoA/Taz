@@ -21,6 +21,7 @@ mod functions;
 mod operators;
 mod token;
 
+mod converter;
 mod evaluator;
 mod tokenizer;
 
@@ -57,7 +58,7 @@ impl InfixExpression {
 
     /// Convert infix expression into postfix expression
     pub fn to_postfix(&self) -> Result<PostfixExpression, String> {
-        let postfix_tokens: Vec<token::Token> = evaluator::infix_to_postfix(&self.tokens)?;
+        let postfix_tokens: Vec<token::Token> = converter::infix_to_postfix(&self.tokens)?;
 
         return Ok(PostfixExpression {
             tokens: postfix_tokens,
