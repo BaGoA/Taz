@@ -25,56 +25,17 @@ mod converter;
 mod evaluator;
 mod tokenizer;
 
-/// Definition of postfix expression
-pub struct PostfixExpression {
-    tokens: Vec<token::Token>,
-}
-
-impl PostfixExpression {
-    /// Evaluate postfix expression
-    pub fn evaluate(&self) -> Result<f64, String> {
-        return evaluator::postfix_evaluation(&self.tokens);
-    }
-}
-
-/// Definition of infix expression
-pub struct InfixExpression {
-    tokens: Vec<token::Token>,
-}
-
-impl InfixExpression {
-    /// Create an infix expression from string
-    pub fn new(expression: &String) -> Result<Self, String> {
-        if expression.len() == 0 {
-            return Err(String::from("The expression to evaluate is empty"));
-        }
-
-        let tokens_from_expression: Vec<token::Token> = tokenizer::tokenize(&expression.as_str())?;
-
-        return Ok(InfixExpression {
-            tokens: tokens_from_expression,
-        });
-    }
-
-    /// Convert infix expression into postfix expression
-    pub fn to_postfix(&self) -> Result<PostfixExpression, String> {
-        let postfix_tokens: Vec<token::Token> = converter::infix_to_postfix(&self.tokens)?;
-
-        return Ok(PostfixExpression {
-            tokens: postfix_tokens,
-        });
-    }
+/// Expression evaluation
+pub fn evaluate(expression: &String) -> Result<f64, String> {
+    let tokens: Vec<token::Token> = tokenizer::tokenize(expression.as_str())?;
+    let posfix_tokens: Vec<token::Token> = converter::infix_to_postfix(&tokens)?;
+    return evaluator::postfix_evaluation(&posfix_tokens);
 }
 
 /// Units tests
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    fn evaluate(expression: &String) -> Result<f64, String> {
-        let infix_expression: InfixExpression = InfixExpression::new(&expression)?;
-        return infix_expression.to_postfix()?.evaluate();
-    }
 
     fn relative_error(value: f64, reference: f64) -> f64 {
         if reference == 0.0 {
