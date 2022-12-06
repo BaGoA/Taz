@@ -21,6 +21,7 @@ use super::functions::Function;
 use super::operators::{BinaryOperator, UnaryOperator};
 use super::token::Token;
 
+use std::collections::HashMap;
 use std::iter::Peekable;
 use std::ops::Fn;
 use std::str::Chars;
@@ -70,7 +71,7 @@ fn extract_word(char_it: &mut Peekable<Chars<'_>>) -> String {
 
 /// Tokenization of expression given by user via its char iterator
 #[allow(dead_code)]
-pub fn tokenize(expression: &str) -> Result<Vec<Token>, String> {
+pub fn tokenize(expression: &str, variables: &HashMap<String, f64>) -> Result<Vec<Token>, String> {
     let mut tokens: Vec<Token> = Vec::with_capacity(expression.len());
     let mut char_it = expression.chars().peekable();
 
@@ -106,6 +107,8 @@ pub fn tokenize(expression: &str) -> Result<Vec<Token>, String> {
                 tokens.push(Token::new_constant(name.as_str())?);
             } else if Function::is_fun(name.as_str()) {
                 tokens.push(Token::new_function(name.as_str())?);
+            } else if variables.contains_key(&name) {
+                tokens.push(Token::new_number(variables[&name]));
             } else {
                 return Err(String::from("Cannot parse this expression"));
             }
@@ -261,7 +264,9 @@ mod tests {
         let expression: &str = "4354.75";
         let number_ref: f64 = 4354.75;
 
-        match tokenize(expression) {
+        let variables: HashMap<String, f64> = HashMap::new();
+
+        match tokenize(expression, &variables) {
             Ok(tokens) => {
                 assert_eq!(tokens.len(), 1);
 
@@ -277,15 +282,17 @@ mod tests {
     #[test]
     fn test_tokenization_expression_with_numbers_binary_operator() {
         let expression: &str = "43.75 - 20.97";
-        let right_number_ref: f64 = 43.75;
-        let left_number_ref: f64 = 20.97;
+        let left_number_ref: f64 = 43.75;
+        let right_number_ref: f64 = 20.97;
 
-        match tokenize(expression) {
+        let variables: HashMap<String, f64> = HashMap::new();
+
+        match tokenize(expression, &variables) {
             Ok(tokens) => {
                 assert_eq!(tokens.len(), 3);
 
                 match tokens[0] {
-                    Token::Number(number) => assert_eq!(number, right_number_ref),
+                    Token::Number(number) => assert_eq!(number, left_number_ref),
                     _ => assert!(false),
                 }
 
@@ -295,7 +302,7 @@ mod tests {
                 }
 
                 match tokens[2] {
-                    Token::Number(number) => assert_eq!(number, left_number_ref),
+                    Token::Number(number) => assert_eq!(number, right_number_ref),
                     _ => assert!(false),
                 }
             }
@@ -306,10 +313,12 @@ mod tests {
     #[test]
     fn test_tokenization_expresion_with_numbers_operators() {
         let expression: &str = "-43.75 + 20.97";
-        let right_number_ref: f64 = 43.75;
-        let left_number_ref: f64 = 20.97;
+        let left_number_ref: f64 = 43.75;
+        let right_number_ref: f64 = 20.97;
 
-        match tokenize(expression) {
+        let variables: HashMap<String, f64> = HashMap::new();
+
+        match tokenize(expression, &variables) {
             Ok(tokens) => {
                 assert_eq!(tokens.len(), 4);
 
@@ -319,7 +328,7 @@ mod tests {
                 }
 
                 match tokens[1] {
-                    Token::Number(number) => assert_eq!(number, right_number_ref),
+                    Token::Number(number) => assert_eq!(number, left_number_ref),
                     _ => assert!(false),
                 }
 
@@ -329,7 +338,7 @@ mod tests {
                 }
 
                 match tokens[3] {
-                    Token::Number(number) => assert_eq!(number, left_number_ref),
+                    Token::Number(number) => assert_eq!(number, right_number_ref),
                     _ => assert!(false),
                 }
             }
@@ -342,7 +351,9 @@ mod tests {
         let expression: &str = "43.75 + (-20.97 / 2.87) * 3.14";
         let numbers: Vec<f64> = vec![43.75, 20.97, 2.87, 3.14];
 
-        match tokenize(expression) {
+        let variables: HashMap<String, f64> = HashMap::new();
+
+        match tokenize(expression, &variables) {
             Ok(tokens) => {
                 assert_eq!(tokens.len(), 10);
 
@@ -407,7 +418,9 @@ mod tests {
         let expression: &str = "sqrt(9.0)";
         let number_ref: f64 = 9.0;
 
-        match tokenize(expression) {
+        let variables: HashMap<String, f64> = HashMap::new();
+
+        match tokenize(expression, &variables) {
             Ok(tokens) => {
                 assert_eq!(tokens.len(), 4);
 
@@ -440,7 +453,9 @@ mod tests {
         let expression: &str = "pi / 2.0";
         let number_ref: f64 = 2.0;
 
-        match tokenize(expression) {
+        let variables: HashMap<String, f64> = HashMap::new();
+
+        match tokenize(expression, &variables) {
             Ok(tokens) => {
                 assert_eq!(tokens.len(), 3);
 
@@ -468,7 +483,9 @@ mod tests {
         let expression: &str = "sin(2.0 - pi) * cos((-pi + 2.0) / 2.0)";
         let number_ref: f64 = 2.0;
 
-        match tokenize(expression) {
+        let variables: HashMap<String, f64> = HashMap::new();
+
+        match tokenize(expression, &variables) {
             Ok(tokens) => {
                 assert_eq!(tokens.len(), 18);
 
@@ -558,6 +575,100 @@ mod tests {
                 }
 
                 match tokens[17] {
+                    Token::RightParenthesis => assert!(true),
+                    _ => assert!(false),
+                }
+            }
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_tokenization_expression_with_variables() {
+        let expression: &str = "left - right";
+        let left_number_ref: f64 = 43.75;
+        let right_number_ref: f64 = 20.97;
+
+        let variables: HashMap<String, f64> = HashMap::from([
+            (String::from("left"), left_number_ref),
+            (String::from("right"), right_number_ref),
+        ]);
+
+        match tokenize(expression, &variables) {
+            Ok(tokens) => {
+                assert_eq!(tokens.len(), 3);
+
+                match tokens[0] {
+                    Token::Number(number) => assert_eq!(number, left_number_ref),
+                    _ => assert!(false),
+                }
+
+                match tokens[1] {
+                    Token::BinaryOperator(operator) => assert_eq!(operator, BinaryOperator::Minus),
+                    _ => assert!(false),
+                }
+
+                match tokens[2] {
+                    Token::Number(number) => assert_eq!(number, right_number_ref),
+                    _ => assert!(false),
+                }
+            }
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_tokenization_expression_with_variables_and_function() {
+        let expression: &str = "left - right + sqrt(9.0)";
+        let left_number_ref: f64 = 43.75;
+        let right_number_ref: f64 = 20.97;
+        let sqrt_arg_number_ref: f64 = 9.0;
+
+        let variables: HashMap<String, f64> = HashMap::from([
+            (String::from("left"), left_number_ref),
+            (String::from("right"), right_number_ref),
+        ]);
+
+        match tokenize(expression, &variables) {
+            Ok(tokens) => {
+                assert_eq!(tokens.len(), 8);
+
+                match tokens[0] {
+                    Token::Number(number) => assert_eq!(number, left_number_ref),
+                    _ => assert!(false),
+                }
+
+                match tokens[1] {
+                    Token::BinaryOperator(operator) => assert_eq!(operator, BinaryOperator::Minus),
+                    _ => assert!(false),
+                }
+
+                match tokens[2] {
+                    Token::Number(number) => assert_eq!(number, right_number_ref),
+                    _ => assert!(false),
+                }
+
+                match tokens[3] {
+                    Token::BinaryOperator(operator) => assert_eq!(operator, BinaryOperator::Plus),
+                    _ => assert!(false),
+                }
+
+                match tokens[4] {
+                    Token::Function(fun) => assert_eq!(fun, Function::Sqrt),
+                    _ => assert!(false),
+                }
+
+                match tokens[5] {
+                    Token::LeftParenthesis => assert!(true),
+                    _ => assert!(false),
+                }
+
+                match tokens[6] {
+                    Token::Number(number) => assert_eq!(number, sqrt_arg_number_ref),
+                    _ => assert!(false),
+                }
+
+                match tokens[7] {
                     Token::RightParenthesis => assert!(true),
                     _ => assert!(false),
                 }
