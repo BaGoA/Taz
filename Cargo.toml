@@ -7,7 +7,7 @@ license-file = "LICENSE.md"
 description = "Taz is Rust library to evaluate a mathematical expression"
 repository = "https://github.com/BaGoA/Taz"
 readme = "README.md"
-keywords = ["mathematical-expressions", "expression-evaluator"]
+keywords = ["math-expressions", "calculator"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
