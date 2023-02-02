@@ -3,6 +3,11 @@ name = "taz"
 version = "0.1.0"
 authors = ["Bastian Gonzalez Acevedo <bastiangonzalezacevedo@gmail.com>"]
 edition = "2021"
+license-file = "LICENSE.md"
+description = "Taz is Rust library to evaluate a mathematical expression"
+repository = "https://github.com/BaGoA/Taz"
+readme = "README.md"
+keywords = ["mathematical expressions", "expression evaluator"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
