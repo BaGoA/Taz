@@ -33,6 +33,3 @@ correspond to infix expression
 Then, we convert this infix expression into postfix expression. Indeed an evaluation of postfix expression is easier.
 
 Finally we evaluate the posfix expression by stack method.
-
-## Licensing
-Taz library is free software, you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License.
