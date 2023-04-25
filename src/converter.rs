@@ -1,25 +1,8 @@
-/*
-Taz is mathematical expression evaluation library
-Copyright (C) 2022  Bastian Gonzalez Acevedo
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
 use super::operators::BinaryOperator;
 use super::token::Token;
 
-/// Check if last token, which can represent an operator or left parenthesis, is primary with current_ops
+/// Check if last token, which can represent an operator or left parenthesis, is primary
+/// with binary operator given in argument
 fn last_operator_is_primary(token_ops: Token, current_ops: BinaryOperator) -> bool {
     match token_ops {
         Token::UnaryOperator(_) => true,

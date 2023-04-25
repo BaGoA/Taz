@@ -1,21 +1,3 @@
-/*
-Taz is mathematical expression evaluation library
-Copyright (C) 2022  Bastian Gonzalez Acevedo
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
 use super::constants::*;
 use super::functions::Function;
 use super::operators::{BinaryOperator, UnaryOperator};
@@ -69,7 +51,7 @@ fn extract_word(char_it: &mut Peekable<Chars<'_>>) -> String {
     return extract_if(char_it, |c: char| c.is_alphanumeric() || c == '_');
 }
 
-/// Tokenization of expression given by user via its char iterator
+/// Tokenization of expression which can contain custom variable given in argument
 #[allow(dead_code)]
 pub fn tokenize(expression: &str, variables: &HashMap<String, f64>) -> Result<Vec<Token>, String> {
     let mut tokens: Vec<Token> = Vec::with_capacity(expression.len());

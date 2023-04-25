@@ -1,21 +1,3 @@
-/*
-Taz is mathematical expression evaluation library
-Copyright (C) 2022  Bastian Gonzalez Acevedo
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-
 mod constants;
 mod functions;
 mod operators;
@@ -27,7 +9,7 @@ mod tokenizer;
 
 use std::collections::HashMap;
 
-/// Evaluation of expression without variables
+/// Evaluate an expression given in argument
 pub fn evaluate(expression: &String) -> Result<f64, String> {
     let variables: HashMap<String, f64> = HashMap::new();
     let tokens: Vec<token::Token> = tokenizer::tokenize(expression.as_str(), &variables)?;
@@ -36,6 +18,7 @@ pub fn evaluate(expression: &String) -> Result<f64, String> {
     return evaluator::postfix_evaluation(&posfix_tokens);
 }
 
+/// Evaluate an expression containing customs variables given in argument
 pub fn evaluate_with_variables(
     expression: &String,
     variables: &HashMap<String, f64>,
