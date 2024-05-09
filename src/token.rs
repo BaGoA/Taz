@@ -24,40 +24,28 @@ impl Token {
     /// If char given in argument does not correspond to operator,
     /// an error message is stored in string contained in Result output
     pub fn new_binary_ops(ops: char) -> Result<Token, String> {
-        match BinaryOperator::from_char(ops) {
-            Ok(ops) => Ok(Token::BinaryOperator(ops)),
-            Err(message) => Err(message),
-        }
+        BinaryOperator::from_char(ops).map(|binary_ops| Token::BinaryOperator(binary_ops))
     }
 
     /// Create a unary operator token from char
     /// If char given in argument does not correspond to operator,
     /// an error message is stored in string contained in Result output
     pub fn new_unary_ops(ops: char) -> Result<Token, String> {
-        match UnaryOperator::from_char(ops) {
-            Ok(ops) => Ok(Token::UnaryOperator(ops)),
-            Err(message) => Err(message),
-        }
+        UnaryOperator::from_char(ops).map(|unary_ops| Token::UnaryOperator(unary_ops))
     }
 
     /// Create a constant token from string
     /// If string given in argument does not correspond to constants,
     /// an error message is stored in string contained in Result output
     pub fn new_constant(constant: &str) -> Result<Token, String> {
-        match constants::from_string(constant) {
-            Ok(value) => Ok(Token::Constant(value)),
-            Err(message) => Err(message),
-        }
+        constants::from_string(constant).map(|value| Token::Constant(value))
     }
 
     /// Create a function token from string
     /// If string given in argument does not correspond to constants,
     /// an error message is stored in string contained in Result output
     pub fn new_function(fun_name: &str) -> Result<Token, String> {
-        match Function::from_string(fun_name) {
-            Ok(fun) => Ok(Token::Function(fun)),
-            Err(message) => Err(message),
-        }
+        Function::from_string(fun_name).map(|fun| Token::Function(fun))
     }
 }
 
