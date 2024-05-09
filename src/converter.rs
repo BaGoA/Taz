@@ -23,12 +23,12 @@ fn last_operator_is_primary(token_ops: Token, current_ops: BinaryOperator) -> bo
 /// Convert infix representation of expression into postfix representation
 /// If error occurs during evaluation, an error message is stored
 /// in string contained in Result output
-pub fn infix_to_postfix(tokens: &Vec<Token>) -> Result<Vec<Token>, String> {
+pub fn infix_to_postfix(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
     // Build postfix expression from infix expression
     let mut tokens_postfix: Vec<Token> = Vec::with_capacity(tokens.len());
     let mut stack_operator: Vec<Token> = Vec::with_capacity(tokens.len());
 
-    for &token in tokens {
+    for token in tokens {
         match token {
             Token::Number(_) => tokens_postfix.push(token),
             Token::Constant(_) => tokens_postfix.push(token),
@@ -108,7 +108,7 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 3);
 
@@ -140,7 +140,7 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 4);
 
@@ -180,7 +180,7 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 7);
 
@@ -235,7 +235,7 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 7);
 
@@ -290,7 +290,7 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 7);
 
@@ -349,7 +349,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 7);
 
@@ -410,7 +410,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 8);
 
@@ -479,7 +479,7 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 13);
 
@@ -568,7 +568,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 7);
 
@@ -621,7 +621,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 3);
 
@@ -653,7 +653,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 2);
 
@@ -686,7 +686,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(_tokens_postfix) => assert!(false),
             Err(message) => assert!(message.len() > 0),
         }
@@ -707,7 +707,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&tokens) {
+        match infix_to_postfix(tokens) {
             Ok(_tokens_postfix) => assert!(false),
             Err(message) => assert!(message.len() > 0),
         }

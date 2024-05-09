@@ -3,11 +3,11 @@ use super::token::Token;
 /// Evaluate postfix expression given as vector of token
 /// If error occurs during evaluation, an error message is stored
 /// in string contained in Result output
-pub fn postfix_evaluation(tokens: &Vec<Token>) -> Result<f64, String> {
+pub fn postfix_evaluation(tokens: Vec<Token>) -> Result<f64, String> {
     let mut stack_operand: Vec<f64> = Vec::new();
     stack_operand.reserve(10);
 
-    for &token in tokens {
+    for token in tokens {
         match token {
             Token::Number(number) => stack_operand.push(number),
             Token::BinaryOperator(ops) => {
@@ -76,7 +76,7 @@ mod tests {
             Token::BinaryOperator(BinaryOperator::Plus),
         ];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = 2.0 + 3.0;
                 assert!(relative_error(result, result_ref) < 0.01)
@@ -97,7 +97,7 @@ mod tests {
             Token::BinaryOperator(BinaryOperator::Plus),
         ];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = 8.0 + 9.0 * 2.0 + 3.0;
                 assert!(relative_error(result, result_ref) < 0.01)
@@ -118,7 +118,7 @@ mod tests {
             Token::BinaryOperator(BinaryOperator::Minus),
         ];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = 8.0 / 2.0 - 9.0 / 3.0;
                 assert!(relative_error(result, result_ref) < 0.01)
@@ -139,7 +139,7 @@ mod tests {
             Token::BinaryOperator(BinaryOperator::Plus),
         ];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = 8.0 + 2.0 + 9.0 + 3.0;
                 assert!(relative_error(result, result_ref) < 0.01)
@@ -160,7 +160,7 @@ mod tests {
             Token::BinaryOperator(BinaryOperator::Multiply),
         ];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = (8.0 + 2.0) * (9.0 + 3.0);
                 assert!(relative_error(result, result_ref) < 0.01)
@@ -187,7 +187,7 @@ mod tests {
             Token::BinaryOperator(BinaryOperator::Plus),
         ];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = 3.0 + 4.0 * 2.0 / (16.0 as f64).powf(3.0);
                 assert!(relative_error(result, result_ref) < 0.01)
@@ -208,7 +208,7 @@ mod tests {
             Token::Function(Function::Sin),
         ];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = ((9.0 as f64).sqrt() / 3.0 * 3.1415).sin();
                 assert!(relative_error(result, result_ref) < 0.01)
@@ -226,7 +226,7 @@ mod tests {
             Token::BinaryOperator(BinaryOperator::Plus),
         ];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = -8.0 + 9.0;
                 assert!(relative_error(result, result_ref) < 0.01)
@@ -248,7 +248,7 @@ mod tests {
             Token::BinaryOperator(BinaryOperator::Multiply),
         ];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = (8.0 + 2.0) * (-9.0 / 3.0);
                 assert!(relative_error(result, result_ref) < 0.01)
@@ -265,7 +265,7 @@ mod tests {
             Token::Function(Function::Acos),
         ];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = (-1.0 as f64).acos();
                 assert!(relative_error(result, result_ref) < 0.01)
@@ -278,7 +278,7 @@ mod tests {
     fn test_postfix_evaluation_with_function_constant() {
         let tokens: Vec<Token> = vec![Token::Constant(PI), Token::Function(Function::Cos)];
 
-        match postfix_evaluation(&tokens) {
+        match postfix_evaluation(tokens) {
             Ok(result) => {
                 let result_ref: f64 = -1.0;
                 assert!(relative_error(result, result_ref) < 0.01)

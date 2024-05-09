@@ -14,8 +14,8 @@ pub fn evaluate(expression: &String) -> Result<f64, String> {
     let variables: HashMap<String, f64> = HashMap::new();
     let tokens: Vec<token::Token> = tokenizer::tokenize(expression.as_str(), &variables)?;
 
-    let posfix_tokens: Vec<token::Token> = converter::infix_to_postfix(&tokens)?;
-    return evaluator::postfix_evaluation(&posfix_tokens);
+    let posfix_tokens: Vec<token::Token> = converter::infix_to_postfix(tokens)?;
+    return evaluator::postfix_evaluation(posfix_tokens);
 }
 
 /// Evaluate an expression containing customs variables given in argument
@@ -24,8 +24,8 @@ pub fn evaluate_with_variables(
     variables: &HashMap<String, f64>,
 ) -> Result<f64, String> {
     let tokens: Vec<token::Token> = tokenizer::tokenize(expression.as_str(), variables)?;
-    let posfix_tokens: Vec<token::Token> = converter::infix_to_postfix(&tokens)?;
-    return evaluator::postfix_evaluation(&posfix_tokens);
+    let posfix_tokens: Vec<token::Token> = converter::infix_to_postfix(tokens)?;
+    return evaluator::postfix_evaluation(posfix_tokens);
 }
 
 /// Units tests
