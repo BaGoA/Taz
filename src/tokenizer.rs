@@ -17,10 +17,8 @@ where
     let mut substr: String = String::new();
 
     // Search maximal size that can reach the substr to reserve the memory space
-    let (_lb_size, ub_size): (usize, Option<usize>) = char_it.size_hint();
-
-    if ub_size.is_some() {
-        substr.reserve(ub_size.unwrap());
+    if let (_lb_size, Some(ub_size)) = char_it.size_hint() {
+        substr.reserve(ub_size);
     }
 
     while let Some(&c) = char_it.peek() {

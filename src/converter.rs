@@ -28,11 +28,11 @@ pub fn infix_to_postfix(tokens: &Vec<Token>) -> Result<Vec<Token>, String> {
     let mut tokens_postfix: Vec<Token> = Vec::with_capacity(tokens.len());
     let mut stack_operator: Vec<Token> = Vec::with_capacity(tokens.len());
 
-    for token in tokens {
+    for &token in tokens {
         match token {
-            &Token::Number(_) => tokens_postfix.push(*token),
-            &Token::Constant(_) => tokens_postfix.push(*token),
-            &Token::BinaryOperator(ops) => {
+            Token::Number(_) => tokens_postfix.push(token),
+            Token::Constant(_) => tokens_postfix.push(token),
+            Token::BinaryOperator(ops) => {
                 // Pop stack operator according to last operators precedence
                 while let Some(&stack_last) = stack_operator.last() {
                     if last_operator_is_primary(stack_last, ops) {
@@ -43,12 +43,12 @@ pub fn infix_to_postfix(tokens: &Vec<Token>) -> Result<Vec<Token>, String> {
                     }
                 }
 
-                stack_operator.push(*token);
+                stack_operator.push(token);
             }
-            &Token::UnaryOperator(_) => stack_operator.push(*token),
-            &Token::Function(_) => stack_operator.push(*token),
-            &Token::LeftParenthesis => stack_operator.push(*token),
-            &Token::RightParenthesis => {
+            Token::UnaryOperator(_) => stack_operator.push(token),
+            Token::Function(_) => stack_operator.push(token),
+            Token::LeftParenthesis => stack_operator.push(token),
+            Token::RightParenthesis => {
                 // Pop stack operator between left and right parenthesis
                 while let Some(&stack_last) = stack_operator.last() {
                     if stack_last != Token::LeftParenthesis {

@@ -7,9 +7,9 @@ pub fn postfix_evaluation(tokens: &Vec<Token>) -> Result<f64, String> {
     let mut stack_operand: Vec<f64> = Vec::new();
     stack_operand.reserve(10);
 
-    for token in tokens {
+    for &token in tokens {
         match token {
-            Token::Number(number) => stack_operand.push(*number),
+            Token::Number(number) => stack_operand.push(number),
             Token::BinaryOperator(ops) => {
                 if let Some(right) = stack_operand.pop() {
                     if let Some(left) = stack_operand.pop() {
@@ -39,7 +39,7 @@ pub fn postfix_evaluation(tokens: &Vec<Token>) -> Result<f64, String> {
                     return Err(String::from("Missing argument to apply function"));
                 }
             }
-            Token::Constant(constant) => stack_operand.push(*constant),
+            Token::Constant(constant) => stack_operand.push(constant),
             _ => {
                 return Err(String::from(
                     "Token non-accepted for evaluation of postfix expression",
