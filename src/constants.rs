@@ -4,7 +4,6 @@ pub const E: f64 = std::f64::consts::E;
 pub const C: f64 = 299792458.0;
 
 /// Check if a string correspond to available constant
-#[allow(dead_code)]
 pub fn is_constant(constant: &str) -> bool {
     match constant {
         "pi" => true,
@@ -17,7 +16,6 @@ pub fn is_constant(constant: &str) -> bool {
 /// Get constant value from a string
 /// If string given in argument does not correspond to constants,
 /// an error message is stored in string contained in Result output
-#[allow(dead_code)]
 pub fn from_string(constant: &str) -> Result<f64, String> {
     match constant {
         "pi" => Ok(PI),

@@ -26,7 +26,6 @@ impl Function {
     /// Create a Function from a string
     /// If string given in argument does not correspond to function,
     /// an error message is stored in string contained in Result output
-    #[allow(dead_code)]
     pub fn from_string(fun: &str) -> Result<Function, String> {
         match fun {
             "abs" => Ok(Function::Abs),
@@ -53,7 +52,6 @@ impl Function {
     }
 
     /// Check if a string corresponds to function
-    #[allow(dead_code)]
     pub fn is_fun(fun: &str) -> bool {
         match fun {
             "abs" => true,
@@ -82,7 +80,6 @@ impl Function {
     /// Apply the function on value given in argument.
     /// For limits cases, we check that value is valid.
     /// To take into account this error, the function return a Result<f64, String>
-    #[allow(dead_code)]
     pub fn apply(&self, arg: f64) -> Result<f64, String> {
         match self {
             Function::Abs => Ok(arg.abs()),

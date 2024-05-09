@@ -20,9 +20,9 @@ fn last_operator_is_primary(token_ops: Token, current_ops: BinaryOperator) -> bo
     }
 }
 
-/// Convert vector of token corresponding to infix representation of expression
-/// to vector of token corresponding to postfix representation
-#[allow(dead_code)]
+/// Convert infix representation of expression into postfix representation
+/// If error occurs during evaluation, an error message is stored
+/// in string contained in Result output
 pub fn infix_to_postfix(tokens: &Vec<Token>) -> Result<Vec<Token>, String> {
     // Build postfix expression from infix expression
     let mut tokens_postfix: Vec<Token> = Vec::with_capacity(tokens.len());

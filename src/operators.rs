@@ -12,7 +12,6 @@ impl BinaryOperator {
     /// Create a BinaryOperator from a char
     /// If char given in argument does not correspond to operator,
     /// an error message is stored in string contained in Result output
-    #[allow(dead_code)]
     pub fn from_char(ops: char) -> Result<BinaryOperator, String> {
         match ops {
             '+' => Ok(BinaryOperator::Plus),
@@ -25,7 +24,6 @@ impl BinaryOperator {
     }
 
     /// Check if a char corresponds to binary operator
-    #[allow(dead_code)]
     pub fn is_ops(ops: char) -> bool {
         match ops {
             '+' => true,
@@ -38,7 +36,6 @@ impl BinaryOperator {
     }
 
     /// Association between operator and its precedence
-    #[allow(dead_code)]
     pub fn precedence(&self) -> u8 {
         match self {
             BinaryOperator::Plus => 2,
@@ -50,7 +47,6 @@ impl BinaryOperator {
     }
 
     /// Association between operator and boolean corresponding to left associativity
-    #[allow(dead_code)]
     pub fn is_left_associative(&self) -> bool {
         match self {
             BinaryOperator::Plus => true,
@@ -64,7 +60,6 @@ impl BinaryOperator {
     /// Apply the operation on two values given in argument.
     /// For division case, we check that right_operand is non-null.
     /// To take into account this error, the function return a Result<f64, String>
-    #[allow(dead_code)]
     pub fn apply(&self, left_operand: f64, right_operand: f64) -> Result<f64, String> {
         match self {
             BinaryOperator::Plus => Ok(left_operand + right_operand),
@@ -93,7 +88,6 @@ impl UnaryOperator {
     /// Create a UnaryOperator from a char
     /// If char given in argument does not correspond to operator,
     /// an error message is stored in string contained in Result output
-    #[allow(dead_code)]
     pub fn from_char(ops: char) -> Result<UnaryOperator, String> {
         match ops {
             '+' => Ok(UnaryOperator::Plus),
@@ -103,7 +97,6 @@ impl UnaryOperator {
     }
 
     /// Check if a char correspond to unary operator
-    #[allow(dead_code)]
     pub fn is_ops(ops: char) -> bool {
         match ops {
             '+' => true,
@@ -113,7 +106,6 @@ impl UnaryOperator {
     }
 
     /// Apply the operation on value given in argument.
-    #[allow(dead_code)]
     pub fn apply(&self, operand: f64) -> f64 {
         match self {
             UnaryOperator::Plus => operand,

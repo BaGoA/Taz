@@ -1,8 +1,8 @@
 use super::token::Token;
 
-/// Take a vector of token which represent postfix expression
-/// and evaluate it
-#[allow(dead_code)]
+/// Evaluate postfix expression given as vector of token
+/// If error occurs during evaluation, an error message is stored
+/// in string contained in Result output
 pub fn postfix_evaluation(tokens: &Vec<Token>) -> Result<f64, String> {
     let mut stack_operand: Vec<f64> = Vec::new();
     stack_operand.reserve(10);

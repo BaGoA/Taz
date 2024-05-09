@@ -16,7 +16,6 @@ pub enum Token {
 
 impl Token {
     /// Create a number token
-    #[allow(dead_code)]
     pub fn new_number(value: f64) -> Token {
         Token::Number(value)
     }
@@ -24,7 +23,6 @@ impl Token {
     /// Create a binary operator token from char
     /// If char given in argument does not correspond to operator,
     /// an error message is stored in string contained in Result output
-    #[allow(dead_code)]
     pub fn new_binary_ops(ops: char) -> Result<Token, String> {
         match BinaryOperator::from_char(ops) {
             Ok(ops) => Ok(Token::BinaryOperator(ops)),
@@ -35,7 +33,6 @@ impl Token {
     /// Create a unary operator token from char
     /// If char given in argument does not correspond to operator,
     /// an error message is stored in string contained in Result output
-    #[allow(dead_code)]
     pub fn new_unary_ops(ops: char) -> Result<Token, String> {
         match UnaryOperator::from_char(ops) {
             Ok(ops) => Ok(Token::UnaryOperator(ops)),
@@ -46,7 +43,6 @@ impl Token {
     /// Create a constant token from string
     /// If string given in argument does not correspond to constants,
     /// an error message is stored in string contained in Result output
-    #[allow(dead_code)]
     pub fn new_constant(constant: &str) -> Result<Token, String> {
         match constants::from_string(constant) {
             Ok(value) => Ok(Token::Constant(value)),
@@ -57,7 +53,6 @@ impl Token {
     /// Create a function token from string
     /// If string given in argument does not correspond to constants,
     /// an error message is stored in string contained in Result output
-    #[allow(dead_code)]
     pub fn new_function(fun_name: &str) -> Result<Token, String> {
         match Function::from_string(fun_name) {
             Ok(fun) => Ok(Token::Function(fun)),

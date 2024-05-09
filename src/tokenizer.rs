@@ -8,9 +8,8 @@ use std::iter::Peekable;
 use std::ops::Fn;
 use std::str::Chars;
 
-/// Extract a substring from string given by user.
-/// Each characters of substring check the predicat given in argument
-#[allow(dead_code)]
+/// Extract a substring from string given by user
+/// where each characters check a predicat
 fn extract_if<P>(char_it: &mut Peekable<Chars<'_>>, predicate: P) -> String
 where
     P: Fn(char) -> bool,
@@ -39,20 +38,20 @@ where
 
 /// Extract a number from string given by user via its char iterator
 /// We return an Option<f64>, if we don't find a number the option is none.
-#[allow(dead_code)]
 fn extract_number(char_it: &mut Peekable<Chars<'_>>) -> Option<f64> {
     let str_number: String = extract_if(char_it, |c: char| c.is_digit(10) || c == '.');
     return str_number.parse().ok();
 }
 
 /// Extract a word from string given by user via its char iterator
-#[allow(dead_code)]
 fn extract_word(char_it: &mut Peekable<Chars<'_>>) -> String {
     return extract_if(char_it, |c: char| c.is_alphanumeric() || c == '_');
 }
 
-/// Tokenization of expression which can contain custom variable given in argument
-#[allow(dead_code)]
+/// Tokenization of expression given in argument as string.
+/// This expression can contains predefined variables stored in HashMap given in argument.
+/// If error occurs during evaluation, an error message is stored
+/// in string contained in Result output
 pub fn tokenize(expression: &str, variables: &HashMap<String, f64>) -> Result<Vec<Token>, String> {
     let mut tokens: Vec<Token> = Vec::with_capacity(expression.len());
     let mut char_it = expression.chars().peekable();
