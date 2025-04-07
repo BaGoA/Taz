@@ -1,3 +1,8 @@
+//! Taz
+//!
+//! Taz is Rust library to evaluate a mathematical expression.
+//!
+
 mod constants;
 mod functions;
 mod operators;
