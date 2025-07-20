@@ -76,6 +76,7 @@ pub fn infix_to_postfix(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
                     }
                 }
             }
+            _ => (),
         }
     }
 

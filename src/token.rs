@@ -5,6 +5,7 @@ use super::operators::{BinaryOperator, UnaryOperator};
 /// Token used in library
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Token {
+    Empty,
     Number(f64),
     BinaryOperator(BinaryOperator),
     UnaryOperator(UnaryOperator),

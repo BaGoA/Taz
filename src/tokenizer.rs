@@ -45,54 +45,107 @@ fn extract_word(char_it: &mut Peekable<Chars<'_>>) -> String {
     return extract_if(char_it, |c: char| c.is_alphanumeric() || c == '_');
 }
 
+/// Tokenizer is an iterator over token generated from expression
+struct Tokenizer<'a> {
+    chars_iterator: Peekable<Chars<'a>>,
+    last_extracted_token: Token,
+    error_occured: String,
+    is_first_token: bool,
+}
+
+impl<'a> Tokenizer<'a> {
+    fn new(expression: &'a str) -> Self {
+        return Tokenizer {
+            chars_iterator: expression.chars().peekable(),
+            last_extracted_token: Token::Empty,
+            error_occured: String::new(),
+            is_first_token: true,
+        };
+    }
+}
+
+impl<'a> Iterator for Tokenizer<'a> {
+    type Item = Token;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut token = Token::Empty;
+
+        match self.chars_iterator.peek() {
+            Some(mut c) => {
+                // Skip whitespace
+                while c.is_whitespace() {
+                    self.chars_iterator.next();
+                    c = self.chars_iterator.peek()?;
+                }
+
+                // Extract token
+                if c.is_digit(10) {
+                    match extract_number(self.chars_iterator.by_ref()) {
+                        Some(number) => token = Token::new_number(number),
+                        None => {
+                            self.error_occured = String::from("Cannot parse a number in expression")
+                        }
+                    }
+                } else if BinaryOperator::is_ops(*c) || UnaryOperator::is_ops(*c) {
+                    let token_ops_result = if self.is_first_token
+                        || self.last_extracted_token == Token::LeftParenthesis
+                    {
+                        Token::new_unary_ops(*c)
+                    } else {
+                        Token::new_binary_ops(*c)
+                    };
+
+                    match token_ops_result {
+                        Ok(token_ops) => token = token_ops,
+                        Err(error_str) => self.error_occured = error_str,
+                    }
+
+                    self.chars_iterator.next();
+                } else if *c == '(' {
+                    token = Token::LeftParenthesis;
+                    self.chars_iterator.next();
+                } else if *c == ')' {
+                    token = Token::RightParenthesis;
+                    self.chars_iterator.next();
+                } else if c.is_alphanumeric() {
+                    let name: String = extract_word(self.chars_iterator.by_ref());
+
+                    if is_constant(name.as_str()) {
+                        match Token::new_constant(name.as_str()) {
+                            Ok(token_constant) => token = token_constant,
+                            Err(error_str) => self.error_occured = error_str,
+                        }
+                    } else if Function::is_fun(name.as_str()) {
+                        match Token::new_function(name.as_str()) {
+                            Ok(token_fun) => token = token_fun,
+                            Err(error_str) => self.error_occured = error_str,
+                        }
+                    } else {
+                        token = Token::Empty;
+                    }
+                } else {
+                    token = Token::Empty;
+                }
+            }
+            None => (),
+        }
+
+        self.is_first_token = false;
+        self.last_extracted_token = token;
+
+        return match token {
+            Token::Empty => None,
+            _ => Some(token),
+        };
+    }
+}
+
 /// Tokenization of expression given in argument as string.
 /// If error occurs during evaluation, an error message is stored
 /// in string contained in Result output
 pub fn tokenize(expression: &str) -> Result<Vec<Token>, String> {
-    let mut tokens: Vec<Token> = Vec::with_capacity(expression.len());
-    let mut char_it = expression.chars().peekable();
-
-    while let Some(&c) = char_it.peek() {
-        if c.is_whitespace() {
-            char_it.next();
-        } else if c.is_digit(10) {
-            match extract_number(char_it.by_ref()) {
-                Some(number) => tokens.push(Token::new_number(number)),
-                None => return Err(String::from("Cannot parse this expression")),
-            }
-        } else if BinaryOperator::is_ops(c) || UnaryOperator::is_ops(c) {
-            if tokens.is_empty() {
-                tokens.push(Token::new_unary_ops(c)?);
-            } else {
-                match tokens.last().unwrap() {
-                    &Token::LeftParenthesis => tokens.push(Token::new_unary_ops(c)?),
-                    _ => tokens.push(Token::new_binary_ops(c)?),
-                }
-            }
-
-            char_it.next();
-        } else if c == '(' {
-            tokens.push(Token::LeftParenthesis);
-            char_it.next();
-        } else if c == ')' {
-            tokens.push(Token::RightParenthesis);
-            char_it.next();
-        } else if c.is_alphanumeric() {
-            let name: String = extract_word(char_it.by_ref());
-
-            if is_constant(name.as_str()) {
-                tokens.push(Token::new_constant(name.as_str())?);
-            } else if Function::is_fun(name.as_str()) {
-                tokens.push(Token::new_function(name.as_str())?);
-            } else {
-                return Err(String::from("Cannot parse this expression"));
-            }
-        } else {
-            return Err(String::from("Cannot parse this expression"));
-        }
-    }
-
-    return Ok(tokens);
+    let tokenizer = Tokenizer::new(expression);
+    return Ok(tokenizer.collect());
 }
 
 // Units tests
