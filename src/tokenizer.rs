@@ -2,8 +2,10 @@ use super::constants::*;
 use super::functions::Function;
 use super::operators::{BinaryOperator, UnaryOperator};
 use super::token::Token;
+use super::token_iterator::TokenIterator;
 
 use std::iter::Peekable;
+use std::num::ParseFloatError;
 use std::ops::Fn;
 use std::str::Chars;
 
@@ -34,10 +36,13 @@ where
 }
 
 /// Extract a number from string given by user via its char iterator
-/// We return an Option<f64>, if we don't find a number the option is none.
-fn extract_number(char_it: &mut Peekable<Chars<'_>>) -> Option<f64> {
+/// If we don't find a number, we return an error message in Err of the result.
+fn extract_number(char_it: &mut Peekable<Chars<'_>>) -> Result<f64, String> {
     let str_number: String = extract_if(char_it, |c: char| c.is_digit(10) || c == '.');
-    return str_number.parse().ok();
+
+    return str_number
+        .parse()
+        .map_err(|err: ParseFloatError| err.to_string());
 }
 
 /// Extract a word from string given by user via its char iterator
@@ -49,7 +54,6 @@ fn extract_word(char_it: &mut Peekable<Chars<'_>>) -> String {
 struct Tokenizer<'a> {
     chars_iterator: Peekable<Chars<'a>>,
     last_extracted_token: Token,
-    error_occured: String,
     is_first_token: bool,
 }
 
@@ -58,36 +62,33 @@ impl<'a> Tokenizer<'a> {
         return Tokenizer {
             chars_iterator: expression.chars().peekable(),
             last_extracted_token: Token::Empty,
-            error_occured: String::new(),
             is_first_token: true,
         };
     }
 }
 
-impl<'a> Iterator for Tokenizer<'a> {
-    type Item = Token;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let mut token = Token::Empty;
+impl<'a> TokenIterator for Tokenizer<'a> {
+    fn next_token(&mut self) -> Result<Token, String> {
+        let mut next_token: Result<Token, String> = Ok(Token::Empty);
 
         match self.chars_iterator.peek() {
             Some(mut c) => {
                 // Skip whitespace
                 while c.is_whitespace() {
                     self.chars_iterator.next();
-                    c = self.chars_iterator.peek()?;
+
+                    match self.chars_iterator.peek() {
+                        Some(next_char) => c = next_char,
+                        None => return Ok(Token::Empty),
+                    }
                 }
 
                 // Extract token
                 if c.is_digit(10) {
-                    match extract_number(self.chars_iterator.by_ref()) {
-                        Some(number) => token = Token::new_number(number),
-                        None => {
-                            self.error_occured = String::from("Cannot parse a number in expression")
-                        }
-                    }
+                    next_token = extract_number(self.chars_iterator.by_ref())
+                        .map(|number: f64| Token::new_number(number));
                 } else if BinaryOperator::is_ops(*c) || UnaryOperator::is_ops(*c) {
-                    let token_ops_result = if self.is_first_token
+                    next_token = if self.is_first_token
                         || self.last_extracted_token == Token::LeftParenthesis
                     {
                         Token::new_unary_ops(*c)
@@ -95,48 +96,43 @@ impl<'a> Iterator for Tokenizer<'a> {
                         Token::new_binary_ops(*c)
                     };
 
-                    match token_ops_result {
-                        Ok(token_ops) => token = token_ops,
-                        Err(error_str) => self.error_occured = error_str,
-                    }
-
                     self.chars_iterator.next();
                 } else if *c == '(' {
-                    token = Token::LeftParenthesis;
+                    next_token = Ok(Token::LeftParenthesis);
                     self.chars_iterator.next();
                 } else if *c == ')' {
-                    token = Token::RightParenthesis;
+                    next_token = Ok(Token::RightParenthesis);
                     self.chars_iterator.next();
                 } else if c.is_alphanumeric() {
                     let name: String = extract_word(self.chars_iterator.by_ref());
 
-                    if is_constant(name.as_str()) {
-                        match Token::new_constant(name.as_str()) {
-                            Ok(token_constant) => token = token_constant,
-                            Err(error_str) => self.error_occured = error_str,
-                        }
+                    next_token = if is_constant(name.as_str()) {
+                        Token::new_constant(name.as_str())
                     } else if Function::is_fun(name.as_str()) {
-                        match Token::new_function(name.as_str()) {
-                            Ok(token_fun) => token = token_fun,
-                            Err(error_str) => self.error_occured = error_str,
-                        }
+                        Token::new_function(name.as_str())
                     } else {
-                        token = Token::Empty;
+                        Err(format!(
+                            "The string {} does not correspond to existing tokens",
+                            name
+                        ))
                     }
                 } else {
-                    token = Token::Empty;
+                    next_token = Err(format!(
+                        "The character {} does not correspond to existing tokens",
+                        c
+                    ))
                 }
             }
             None => (),
         }
 
         self.is_first_token = false;
-        self.last_extracted_token = token;
-
-        return match token {
-            Token::Empty => None,
-            _ => Some(token),
+        self.last_extracted_token = match next_token {
+            Ok(token) => token,
+            Err(_) => Token::Empty,
         };
+
+        return next_token;
     }
 }
 
@@ -145,7 +141,7 @@ impl<'a> Iterator for Tokenizer<'a> {
 /// in string contained in Result output
 pub fn tokenize(expression: &str) -> Result<Vec<Token>, String> {
     let tokenizer = Tokenizer::new(expression);
-    return Ok(tokenizer.collect());
+    return tokenizer.collect_all_tokens();
 }
 
 // Units tests
@@ -158,9 +154,10 @@ mod tests {
         let number: i64 = 4354;
         let str_number: String = number.to_string();
 
-        let value: Option<f64> = extract_number(str_number.chars().peekable().by_ref());
-        assert!(value.is_some());
-        assert_eq!(value.unwrap(), number as f64);
+        match extract_number(str_number.chars().peekable().by_ref()) {
+            Ok(extracted_number) => assert_eq!(extracted_number, number as f64),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
@@ -168,9 +165,10 @@ mod tests {
         let number: f64 = 4354.75;
         let str_number: String = number.to_string();
 
-        let value: Option<f64> = extract_number(str_number.chars().peekable().by_ref());
-        assert!(value.is_some());
-        assert_eq!(value.unwrap(), number);
+        match extract_number(str_number.chars().peekable().by_ref()) {
+            Ok(extracted_number) => assert_eq!(extracted_number, number as f64),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
@@ -180,9 +178,10 @@ mod tests {
 
         str_number.push_str("Hello World");
 
-        let value: Option<f64> = extract_number(str_number.chars().peekable().by_ref());
-        assert!(value.is_some());
-        assert_eq!(value.unwrap(), number as f64);
+        match extract_number(str_number.chars().peekable().by_ref()) {
+            Ok(extracted_number) => assert_eq!(extracted_number, number as f64),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
@@ -192,9 +191,10 @@ mod tests {
 
         str_number.push_str("Hello World");
 
-        let value: Option<f64> = extract_number(str_number.chars().peekable().by_ref());
-        assert!(value.is_some());
-        assert_eq!(value.unwrap(), number);
+        match extract_number(str_number.chars().peekable().by_ref()) {
+            Ok(extracted_number) => assert_eq!(extracted_number, number as f64),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
@@ -212,9 +212,10 @@ mod tests {
         assert_eq!(char_it.next(), Some('t'));
         assert_eq!(char_it.next(), Some('('));
 
-        let value: Option<f64> = extract_number(char_it.peekable().by_ref());
-        assert!(value.is_some());
-        assert_eq!(value.unwrap(), number as f64);
+        match extract_number(char_it.peekable().by_ref()) {
+            Ok(extracted_number) => assert_eq!(extracted_number, number as f64),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
@@ -232,9 +233,10 @@ mod tests {
         assert_eq!(char_it.next(), Some('t'));
         assert_eq!(char_it.next(), Some('('));
 
-        let value: Option<f64> = extract_number(char_it.peekable().by_ref());
-        assert!(value.is_some());
-        assert_eq!(value.unwrap(), number);
+        match extract_number(char_it.peekable().by_ref()) {
+            Ok(extracted_number) => assert_eq!(extracted_number, number as f64),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]

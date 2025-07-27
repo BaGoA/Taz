@@ -7,6 +7,7 @@ mod constants;
 mod functions;
 mod operators;
 mod token;
+mod token_iterator;
 
 mod converter;
 mod evaluator;
