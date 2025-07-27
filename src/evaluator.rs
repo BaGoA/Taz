@@ -1,4 +1,4 @@
-use super::token::Token;
+use crate::token::Token;
 
 /// Evaluate postfix expression given as vector of token
 /// If error occurs during evaluation, an error message is stored
@@ -54,10 +54,9 @@ pub fn postfix_evaluation(tokens: Vec<Token>) -> Result<f64, String> {
 // Units tests
 #[cfg(test)]
 mod tests {
-    use super::super::constants::PI;
-    use super::super::functions::Function;
-    use super::super::operators::BinaryOperator;
-    use super::super::operators::UnaryOperator;
+    use super::super::token::constants::PI;
+    use super::super::token::functions::Function;
+    use super::super::token::operators::{BinaryOperator, UnaryOperator};
     use super::*;
 
     fn relative_error(value: f64, reference: f64) -> f64 {

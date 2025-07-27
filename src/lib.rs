@@ -3,14 +3,12 @@
 //! Taz is Rust library to evaluate a mathematical expression.
 //!
 
-mod constants;
-mod functions;
-mod operators;
 mod token;
 mod token_iterator;
 
 mod converter;
 mod evaluator;
+mod infix;
 mod tokenizer;
 
 /// Evaluate a mathematical expression.

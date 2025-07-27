@@ -50,16 +50,17 @@ fn extract_word(char_it: &mut Peekable<Chars<'_>>) -> String {
     return extract_if(char_it, |c: char| c.is_alphanumeric() || c == '_');
 }
 
-/// Tokenizer is an iterator over token generated from expression
-struct Tokenizer<'a> {
+/// Infix is an iterator over tokens of an infix expression
+struct Infix<'a> {
     chars_iterator: Peekable<Chars<'a>>,
     last_extracted_token: Token,
     is_first_token: bool,
 }
 
-impl<'a> Tokenizer<'a> {
+impl<'a> Infix<'a> {
+    /// Create Infix iterator from raw expression
     fn new(expression: &'a str) -> Self {
-        return Tokenizer {
+        return Self {
             chars_iterator: expression.chars().peekable(),
             last_extracted_token: Token::Empty,
             is_first_token: true,
@@ -67,7 +68,7 @@ impl<'a> Tokenizer<'a> {
     }
 }
 
-// impl Tokenizer<'_> {
+// impl Infix<'_> {
 //     fn postfix<PostfixType>(self) -> PostfixType
 //     where
 //         PostfixType: TokenIterator + From<Self>,
@@ -76,7 +77,7 @@ impl<'a> Tokenizer<'a> {
 //     }
 // }
 
-impl<'a> TokenIterator for Tokenizer<'a> {
+impl TokenIterator for Infix<'_> {
     fn next_token(&mut self) -> Result<Token, String> {
         let mut next_token: Result<Token, String> = Ok(Token::Empty);
 
@@ -143,14 +144,6 @@ impl<'a> TokenIterator for Tokenizer<'a> {
 
         return next_token;
     }
-}
-
-/// Tokenization of expression given in argument as string.
-/// If error occurs during evaluation, an error message is stored
-/// in string contained in Result output
-pub fn tokenize(expression: &str) -> Result<Vec<Token>, String> {
-    let tokenizer = Tokenizer::new(expression);
-    return tokenizer.collect_all_tokens();
 }
 
 // Units tests
@@ -296,6 +289,11 @@ mod tests {
         let word: String = extract_word(char_it.peekable().by_ref());
         let word_ref: String = String::from("Ariane");
         assert_eq!(word_ref, word);
+    }
+
+    fn tokenize(expression: &str) -> Result<Vec<Token>, String> {
+        let infix = Infix::new(expression);
+        return infix.collect_all_tokens();
     }
 
     #[test]

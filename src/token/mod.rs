@@ -1,6 +1,9 @@
-use super::constants;
-use super::functions::Function;
-use super::operators::{BinaryOperator, UnaryOperator};
+pub mod constants;
+pub mod functions;
+pub mod operators;
+
+use functions::Function;
+use operators::{BinaryOperator, UnaryOperator};
 
 /// Token used in library
 #[derive(Debug, PartialEq, Clone, Copy)]

@@ -1,5 +1,5 @@
-use super::operators::BinaryOperator;
-use super::token::Token;
+use crate::token::operators::BinaryOperator;
+use crate::token::Token;
 
 /// Check if last token, which can represent an operator or left parenthesis, is primary
 /// with binary operator given in argument
@@ -96,9 +96,9 @@ pub fn infix_to_postfix(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
 // Units tests
 #[cfg(test)]
 mod tests {
-    use super::super::constants;
-    use super::super::functions::Function;
-    use super::super::operators::UnaryOperator;
+    use super::super::token::constants;
+    use super::super::token::functions::Function;
+    use super::super::token::operators::UnaryOperator;
     use super::*;
 
     #[test]

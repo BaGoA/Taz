@@ -1,4 +1,4 @@
-use super::token::Token;
+use crate::token::Token;
 
 /// Trait to specify an iterator over set of token
 pub trait TokenIterator {
