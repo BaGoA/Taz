@@ -3,13 +3,14 @@
 //! Taz is Rust library to evaluate a mathematical expression.
 //!
 
+use token_iterator::TokenIterator;
+
 mod token;
 mod token_iterator;
 
 mod converter;
 mod evaluator;
 mod infix;
-mod tokenizer;
 
 /// Evaluate a mathematical expression.
 ///
@@ -47,7 +48,9 @@ mod tokenizer;
 ///
 /// ```
 pub fn evaluate(expression: &str) -> Result<f64, String> {
-    let tokens: Vec<token::Token> = tokenizer::tokenize(expression)?;
+    let infix_expression = infix::Infix::new(expression);
+
+    let tokens: Vec<token::Token> = infix_expression.collect_all_tokens()?;
     let posfix_tokens: Vec<token::Token> = converter::infix_to_postfix(tokens)?;
 
     return evaluator::postfix_evaluation(posfix_tokens);

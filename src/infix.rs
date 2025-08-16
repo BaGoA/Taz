@@ -51,7 +51,7 @@ fn extract_word(char_it: &mut Peekable<Chars<'_>>) -> String {
 }
 
 /// Infix is an iterator over tokens of an infix expression
-struct Infix<'a> {
+pub struct Infix<'a> {
     chars_iterator: Peekable<Chars<'a>>,
     last_extracted_token: Token,
     is_first_token: bool,
@@ -59,7 +59,7 @@ struct Infix<'a> {
 
 impl<'a> Infix<'a> {
     /// Create Infix iterator from raw expression
-    fn new(expression: &'a str) -> Self {
+    pub fn new(expression: &'a str) -> Self {
         return Self {
             chars_iterator: expression.chars().peekable(),
             last_extracted_token: Token::Empty,
