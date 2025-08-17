@@ -79,7 +79,7 @@ impl<'a> Infix<'a> {
 
 impl TokenIterator for Infix<'_> {
     fn next_token(&mut self) -> Result<Token, String> {
-        let mut next_token: Result<Token, String> = Ok(Token::Empty);
+        let mut next_token: Result<Token, String> = Ok(Token::Stop);
 
         match self.chars_iterator.peek() {
             Some(mut c) => {
@@ -89,7 +89,7 @@ impl TokenIterator for Infix<'_> {
 
                     match self.chars_iterator.peek() {
                         Some(next_char) => c = next_char,
-                        None => return Ok(Token::Empty),
+                        None => return Ok(Token::Stop),
                     }
                 }
 
@@ -139,7 +139,7 @@ impl TokenIterator for Infix<'_> {
         self.is_first_token = false;
         self.last_extracted_token = match next_token {
             Ok(token) => token,
-            Err(_) => Token::Empty,
+            Err(_) => Token::Stop,
         };
 
         return next_token;

@@ -16,8 +16,11 @@ pub trait TokenIterator {
 
         let mut token: Token = self.next_token()?;
 
-        while token != Token::Empty {
-            tokens.push(token);
+        while token != Token::Stop {
+            if token != Token::Empty {
+                tokens.push(token);
+            }
+
             token = self.next_token()?;
         }
 

@@ -16,6 +16,7 @@ pub enum Token {
     RightParenthesis,
     Constant(f64),
     Function(Function),
+    Stop,
 }
 
 impl Token {

@@ -1,5 +1,6 @@
 use crate::token::operators::BinaryOperator;
 use crate::token::Token;
+use crate::token_iterator::TokenIterator;
 
 /// Check if last token, which can represent an operator or left parenthesis, is primary
 /// with binary operator given in argument
@@ -20,77 +21,125 @@ fn last_operator_is_primary(token_ops: Token, current_ops: BinaryOperator) -> bo
     }
 }
 
-/// Convert infix representation of expression into postfix representation
-/// If error occurs during evaluation, an error message is stored
-/// in string contained in Result output
-pub fn infix_to_postfix(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
-    // Build postfix expression from infix expression
-    let mut tokens_postfix: Vec<Token> = Vec::with_capacity(tokens.len());
-    let mut stack_operator: Vec<Token> = Vec::with_capacity(tokens.len());
+/// Postfix is an iterator over tokens of an postfix expression
+pub struct Postfix<T>
+where
+    T: TokenIterator,
+{
+    infix_iterator: T,
+    stack_operator: Vec<Token>,
+    primary_operator: Vec<Token>,
+}
 
-    for token in tokens {
-        match token {
-            Token::Number(_) => tokens_postfix.push(token),
-            Token::Constant(_) => tokens_postfix.push(token),
+impl<T> Postfix<T>
+where
+    T: TokenIterator,
+{
+    pub fn new(infix_iterator: T) -> Self {
+        return Self {
+            infix_iterator,
+            stack_operator: Vec::with_capacity(25),
+            primary_operator: Vec::with_capacity(25),
+        };
+    }
+}
+
+impl<T> From<T> for Postfix<T>
+where
+    T: TokenIterator,
+{
+    fn from(value: T) -> Self {
+        return Self::new(value);
+    }
+}
+
+impl<T> TokenIterator for Postfix<T>
+where
+    T: TokenIterator,
+{
+    fn next_token(&mut self) -> Result<Token, String> {
+        if !self.primary_operator.is_empty() {
+            let token: Token = self.primary_operator[0];
+            self.primary_operator.remove(0);
+
+            return Ok(token);
+        }
+
+        let infix_token: Token = self.infix_iterator.next_token()?;
+
+        match infix_token {
+            Token::Number(_) => return Ok(infix_token),
+            Token::Constant(_) => return Ok(infix_token),
             Token::BinaryOperator(ops) => {
                 // Pop stack operator according to last operators precedence
-                while let Some(&stack_last) = stack_operator.last() {
+                while let Some(&stack_last) = self.stack_operator.last() {
                     if last_operator_is_primary(stack_last, ops) {
-                        tokens_postfix.push(stack_last);
-                        stack_operator.pop();
+                        self.primary_operator.push(stack_last);
+                        self.stack_operator.pop();
                     } else {
                         break;
                     }
                 }
 
-                stack_operator.push(token);
+                self.stack_operator.push(infix_token);
+                return Ok(Token::Empty);
             }
-            Token::UnaryOperator(_) => stack_operator.push(token),
-            Token::Function(_) => stack_operator.push(token),
-            Token::LeftParenthesis => stack_operator.push(token),
+            Token::UnaryOperator(_) => {
+                self.stack_operator.push(infix_token);
+                return Ok(Token::Empty);
+            }
+            Token::Function(_) => {
+                self.stack_operator.push(infix_token);
+                return Ok(Token::Empty);
+            }
+            Token::LeftParenthesis => {
+                self.stack_operator.push(infix_token);
+                return Ok(Token::Empty);
+            }
             Token::RightParenthesis => {
                 // Pop stack operator between left and right parenthesis
-                while let Some(&stack_last) = stack_operator.last() {
+                while let Some(&stack_last) = self.stack_operator.last() {
                     if stack_last != Token::LeftParenthesis {
-                        tokens_postfix.push(stack_last);
-                        stack_operator.pop();
+                        self.primary_operator.push(stack_last);
+                        self.stack_operator.pop();
                     } else {
                         break;
                     }
                 }
 
-                if stack_operator.is_empty() {
+                if self.stack_operator.is_empty() {
                     return Err(String::from("Mismatched parenthesis"));
                 }
 
                 // Pop left parenthesis and function from stack operator
-                stack_operator.pop();
+                self.stack_operator.pop();
 
-                if let Some(&stack_last) = stack_operator.last() {
+                if let Some(&stack_last) = self.stack_operator.last() {
                     match stack_last {
                         Token::Function(_) => {
-                            tokens_postfix.push(stack_last);
-                            stack_operator.pop();
+                            self.primary_operator.push(stack_last);
+                            self.stack_operator.pop();
                         }
                         _ => (),
                     }
                 }
+
+                return Ok(Token::Empty);
             }
-            _ => (),
+            _ => {
+                // Push rest of operator. If stack operator contains left parenthesis, then there is an error
+                if self.stack_operator.is_empty() {
+                    return Ok(Token::Stop);
+                } else {
+                    if self.stack_operator.contains(&Token::LeftParenthesis) {
+                        return Err(String::from("Mismatched parenthesis"));
+                    }
+
+                    return Ok(self.stack_operator.pop().unwrap());
+                }
+            }
         }
     }
-
-    // Push rest of operator. If stack operator contains left parenthesis, then there is an error
-    if !stack_operator.is_empty() {
-        if stack_operator.contains(&Token::LeftParenthesis) {
-            return Err(String::from("Mismatched parenthesis"));
-        }
-
-        stack_operator.reverse();
-        tokens_postfix.splice(tokens_postfix.len().., stack_operator);
-    }
-
-    return Ok(tokens_postfix);
 }
 
 // Units tests
@@ -101,15 +150,42 @@ mod tests {
     use super::super::token::operators::UnaryOperator;
     use super::*;
 
+    // Mock infix iterator from vector of token
+    struct MockInfix<'a> {
+        tokens: core::slice::IterMut<'a, Token>,
+    }
+
+    impl<'a> MockInfix<'a> {
+        fn new(tokens: &'a mut Vec<Token>) -> Self {
+            return Self {
+                tokens: (*tokens).iter_mut(),
+            };
+        }
+    }
+
+    impl<'a> TokenIterator for MockInfix<'a> {
+        fn next_token(&mut self) -> Result<Token, String> {
+            return match self.tokens.next() {
+                Some(&mut token) => Ok(token),
+                None => Ok(Token::Stop),
+            };
+        }
+    }
+
+    fn infix_to_postfix(tokens: &mut Vec<Token>) -> Result<Vec<Token>, String> {
+        let postfix_iterator = Postfix::new(MockInfix::new(tokens));
+        return postfix_iterator.collect_all_tokens();
+    }
+
     #[test]
     fn test_infix_to_postfix_expression_with_numbers_plus_operator() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::Number(2.0),
             Token::BinaryOperator(BinaryOperator::Plus),
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 3);
 
@@ -134,14 +210,14 @@ mod tests {
 
     #[test]
     fn test_infix_to_postfix_expression_with_numbers_plus_operator_minus_unary_operator() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::UnaryOperator(UnaryOperator::Minus),
             Token::Number(2.0),
             Token::BinaryOperator(BinaryOperator::Plus),
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 4);
 
@@ -171,7 +247,7 @@ mod tests {
 
     #[test]
     fn test_infix_to_postfix_expression_with_numbers_plus_operators() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
             Token::Number(2.0),
@@ -181,7 +257,7 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 7);
 
@@ -226,7 +302,7 @@ mod tests {
 
     #[test]
     fn test_infix_to_postfix_expression_with_numbers_plus_multiply_operators() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
             Token::Number(9.0),
@@ -236,7 +312,7 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 7);
 
@@ -281,7 +357,7 @@ mod tests {
 
     #[test]
     fn test_infix_to_postfix_expression_with_numbers_minus_divide_operators() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Divide),
             Token::Number(2.0),
@@ -291,7 +367,7 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 7);
 
@@ -336,7 +412,7 @@ mod tests {
 
     #[test]
     fn test_infix_to_postfix_expression_with_numbers_plus_multiply_operators_parenthesis() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::LeftParenthesis,
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
@@ -350,7 +426,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 7);
 
@@ -396,7 +472,7 @@ mod tests {
     #[test]
     fn test_infix_to_postfix_expression_with_numbers_plus_multiply_divide_operators_minus_unary_operator_parenthesis(
     ) {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::LeftParenthesis,
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
@@ -411,7 +487,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 8);
 
@@ -462,7 +538,7 @@ mod tests {
     #[test]
     fn test_infix_to_postfix_expression_with_numbers_plus_multiply_divide_minus_power_operators_parenthesis(
     ) {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::Number(3.0),
             Token::BinaryOperator(BinaryOperator::Plus),
             Token::Number(4.0),
@@ -480,7 +556,7 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 13);
 
@@ -555,7 +631,7 @@ mod tests {
 
     #[test]
     fn test_infix_to_postfix_expression_with_numbers_divide_multiply_operators_functions() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::Function(Function::Sin),
             Token::LeftParenthesis,
             Token::Function(Function::Sqrt),
@@ -569,7 +645,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 7);
 
@@ -614,7 +690,7 @@ mod tests {
 
     #[test]
     fn test_infix_to_postfix_expression_with_numbers_minus_unary_operator_function() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::Function(Function::Acos),
             Token::LeftParenthesis,
             Token::UnaryOperator(UnaryOperator::Minus),
@@ -622,7 +698,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 3);
 
@@ -647,14 +723,14 @@ mod tests {
 
     #[test]
     fn test_infix_to_postfix_expression_with_constant_function() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::Function(Function::Cos),
             Token::LeftParenthesis,
             Token::Constant(constants::PI),
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(tokens_postfix) => {
                 assert_eq!(tokens_postfix.len(), 2);
 
@@ -674,7 +750,7 @@ mod tests {
 
     #[test]
     fn test_infix_to_postfix_expression_forgot_left_parenthesis() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::LeftParenthesis,
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
@@ -687,7 +763,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(_tokens_postfix) => assert!(false),
             Err(message) => assert!(message.len() > 0),
         }
@@ -695,7 +771,7 @@ mod tests {
 
     #[test]
     fn test_infix_to_postfix_expression_forgot_right_parenthesis() {
-        let tokens: Vec<Token> = vec![
+        let mut tokens: Vec<Token> = vec![
             Token::LeftParenthesis,
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
@@ -708,7 +784,7 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(tokens) {
+        match infix_to_postfix(&mut tokens) {
             Ok(_tokens_postfix) => assert!(false),
             Err(message) => assert!(message.len() > 0),
         }
