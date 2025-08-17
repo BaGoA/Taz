@@ -68,15 +68,6 @@ impl<'a> Infix<'a> {
     }
 }
 
-// impl Infix<'_> {
-//     fn postfix<PostfixType>(self) -> PostfixType
-//     where
-//         PostfixType: TokenIterator + From<Self>,
-//     {
-//         return PostfixType::from(self);
-//     }
-// }
-
 impl TokenIterator for Infix<'_> {
     fn next_token(&mut self) -> Result<Token, String> {
         let mut next_token: Result<Token, String> = Ok(Token::Stop);

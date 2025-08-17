@@ -44,15 +44,6 @@ where
     }
 }
 
-impl<T> From<T> for Postfix<T>
-where
-    T: TokenIterator,
-{
-    fn from(value: T) -> Self {
-        return Self::new(value);
-    }
-}
-
 impl<T> TokenIterator for Postfix<T>
 where
     T: TokenIterator,

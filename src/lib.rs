@@ -10,8 +10,6 @@ mod evaluator;
 mod infix;
 mod postfix;
 
-use token_iterator::TokenIterator;
-
 /// Evaluate a mathematical expression.
 ///
 /// If error occurs during evaluation, an error message is stored in string contained in Result output.
@@ -48,10 +46,10 @@ use token_iterator::TokenIterator;
 ///
 /// ```
 pub fn evaluate(expression: &str) -> Result<f64, String> {
-    let postfix_expression = postfix::Postfix::new(infix::Infix::new(expression));
-    let postfix_tokens: Vec<token::Token> = postfix_expression.collect_all_tokens()?;
+    let expression_evaluator =
+        evaluator::Evaluator::new(postfix::Postfix::new(infix::Infix::new(expression)));
 
-    return evaluator::postfix_evaluation(postfix_tokens);
+    return expression_evaluator.evaluate();
 }
 
 /// Units tests
