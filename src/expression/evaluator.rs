@@ -1,5 +1,5 @@
+use crate::expression::token_iterator::TokenIterator;
 use crate::token::Token;
-use crate::token_iterator::TokenIterator;
 
 pub struct Evaluator<T>
 where
@@ -74,10 +74,12 @@ where
 // Units tests
 #[cfg(test)]
 mod tests {
-    use super::super::token::constants::PI;
-    use super::super::token::functions::Function;
-    use super::super::token::operators::{BinaryOperator, UnaryOperator};
     use super::*;
+    use crate::token::{
+        constants::PI,
+        functions::Function,
+        operators::{BinaryOperator, UnaryOperator},
+    };
 
     fn relative_error(value: f64, reference: f64) -> f64 {
         if reference == 0.0 {

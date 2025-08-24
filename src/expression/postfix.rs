@@ -1,6 +1,6 @@
+use crate::expression::token_iterator::TokenIterator;
 use crate::token::operators::BinaryOperator;
 use crate::token::Token;
-use crate::token_iterator::TokenIterator;
 
 /// Check if last token, which can represent an operator or left parenthesis, is primary
 /// with binary operator given in argument
@@ -136,10 +136,8 @@ where
 // Units tests
 #[cfg(test)]
 mod tests {
-    use super::super::token::constants;
-    use super::super::token::functions::Function;
-    use super::super::token::operators::UnaryOperator;
     use super::*;
+    use crate::token::{constants, functions::Function, operators::UnaryOperator};
 
     // Mock infix iterator from vector of token
     struct MockInfix<'a> {

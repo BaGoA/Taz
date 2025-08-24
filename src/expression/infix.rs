@@ -1,8 +1,8 @@
+use crate::expression::token_iterator::TokenIterator;
 use crate::token::constants::*;
 use crate::token::functions::Function;
 use crate::token::operators::{BinaryOperator, UnaryOperator};
 use crate::token::Token;
-use crate::token_iterator::TokenIterator;
 
 use std::iter::Peekable;
 use std::num::ParseFloatError;
