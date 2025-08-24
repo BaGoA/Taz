@@ -6,8 +6,6 @@
 mod expression;
 mod token;
 
-use expression::{evaluator, infix, postfix};
-
 /// Evaluate a mathematical expression.
 ///
 /// If error occurs during evaluation, an error message is stored in string contained in Result output.
@@ -43,11 +41,9 @@ use expression::{evaluator, infix, postfix};
 /// }
 ///
 /// ```
-pub fn evaluate(expression: &str) -> Result<f64, String> {
-    let expression_evaluator =
-        evaluator::Evaluator::new(postfix::Postfix::new(infix::Infix::new(expression)));
-
-    return expression_evaluator.evaluate();
+pub fn evaluate(raw_expression: &str) -> Result<f64, String> {
+    let expression = expression::Expression::new(raw_expression);
+    return expression.infix().postfix().evaluate();
 }
 
 /// Units tests

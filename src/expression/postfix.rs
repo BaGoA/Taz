@@ -1,3 +1,4 @@
+use crate::expression::evaluator::Evaluator;
 use crate::expression::token_iterator::TokenIterator;
 use crate::token::operators::BinaryOperator;
 use crate::token::Token;
@@ -41,6 +42,10 @@ where
             stack_operator: Vec::with_capacity(25),
             primary_operator: Vec::with_capacity(25),
         };
+    }
+
+    pub fn evaluate(self) -> Result<f64, String> {
+        return Evaluator::new(self).evaluate();
     }
 }
 

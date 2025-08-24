@@ -1,3 +1,4 @@
+use crate::expression::postfix::Postfix;
 use crate::expression::token_iterator::TokenIterator;
 use crate::token::constants::*;
 use crate::token::functions::Function;
@@ -65,6 +66,11 @@ impl<'a> Infix<'a> {
             last_extracted_token: Token::Empty,
             is_first_token: true,
         };
+    }
+
+    /// Create Postfix iterator from Infix iterator
+    pub fn postfix(self) -> Postfix<Self> {
+        return Postfix::<Self>::new(self);
     }
 }
 

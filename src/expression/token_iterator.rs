@@ -8,6 +8,7 @@ pub trait TokenIterator {
 
     /// Collect all token into vector
     /// If a error occurs during the collect, we return an error message in Err of the result.
+    #[cfg(test)]
     fn collect_all_tokens(mut self) -> Result<Vec<Token>, String>
     where
         Self: Sized,
