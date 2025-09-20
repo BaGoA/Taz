@@ -16,7 +16,7 @@ where
         return Self { postfix_iterator };
     }
 
-    /// Evaluate postfix expression given as vector of token
+    /// Evaluate postfix expression through its iterator
     /// If error occurs during evaluation, an error message is stored
     /// in string contained in Result output
     pub fn evaluate(mut self) -> Result<f64, String> {

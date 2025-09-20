@@ -288,317 +288,156 @@ mod tests {
         assert_eq!(word_ref, word);
     }
 
-    fn tokenize(expression: &str) -> Result<Vec<Token>, String> {
-        let infix = Infix::new(expression);
-        return infix.collect_all_tokens();
-    }
-
     #[test]
-    fn test_tokenization_expression_with_number() {
+    fn test_infix_expression_with_number() {
         let expression: &str = "4354.75";
         let number_ref: f64 = 4354.75;
+        let tokens: Vec<Token> = vec![Token::Number(number_ref)];
 
-        match tokenize(expression) {
-            Ok(tokens) => {
-                assert_eq!(tokens.len(), 1);
+        let infix = Infix::new(expression);
 
-                match tokens[0] {
-                    Token::Number(number) => assert_eq!(number, number_ref),
-                    _ => assert!(false),
-                }
-            }
+        match infix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_tokenization_expression_with_numbers_binary_operator() {
+    fn test_infix_expression_with_numbers_binary_operator() {
         let expression: &str = "43.75 - 20.97";
         let left_number_ref: f64 = 43.75;
         let right_number_ref: f64 = 20.97;
 
-        match tokenize(expression) {
-            Ok(tokens) => {
-                assert_eq!(tokens.len(), 3);
+        let tokens: Vec<Token> = vec![
+            Token::Number(left_number_ref),
+            Token::BinaryOperator(BinaryOperator::Minus),
+            Token::Number(right_number_ref),
+        ];
 
-                match tokens[0] {
-                    Token::Number(number) => assert_eq!(number, left_number_ref),
-                    _ => assert!(false),
-                }
+        let infix = Infix::new(expression);
 
-                match tokens[1] {
-                    Token::BinaryOperator(operator) => assert_eq!(operator, BinaryOperator::Minus),
-                    _ => assert!(false),
-                }
-
-                match tokens[2] {
-                    Token::Number(number) => assert_eq!(number, right_number_ref),
-                    _ => assert!(false),
-                }
-            }
+        match infix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_tokenization_expresion_with_numbers_operators() {
+    fn test_infix_expresion_with_numbers_operators() {
         let expression: &str = "-43.75 + 20.97";
         let left_number_ref: f64 = 43.75;
         let right_number_ref: f64 = 20.97;
 
-        match tokenize(expression) {
-            Ok(tokens) => {
-                assert_eq!(tokens.len(), 4);
+        let tokens: Vec<Token> = vec![
+            Token::UnaryOperator(UnaryOperator::Minus),
+            Token::Number(left_number_ref),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(right_number_ref),
+        ];
 
-                match tokens[0] {
-                    Token::UnaryOperator(operator) => assert_eq!(operator, UnaryOperator::Minus),
-                    _ => assert!(false),
-                }
+        let infix = Infix::new(expression);
 
-                match tokens[1] {
-                    Token::Number(number) => assert_eq!(number, left_number_ref),
-                    _ => assert!(false),
-                }
-
-                match tokens[2] {
-                    Token::BinaryOperator(operator) => assert_eq!(operator, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-
-                match tokens[3] {
-                    Token::Number(number) => assert_eq!(number, right_number_ref),
-                    _ => assert!(false),
-                }
-            }
+        match infix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_tokenization_expression_with_numbers_operators_parenthesis() {
+    fn test_infix_expression_with_numbers_operators_parenthesis() {
         let expression: &str = "43.75 + (-20.97 / 2.87) * 3.14";
         let numbers: Vec<f64> = vec![43.75, 20.97, 2.87, 3.14];
 
-        match tokenize(expression) {
-            Ok(tokens) => {
-                assert_eq!(tokens.len(), 10);
+        let tokens: Vec<Token> = vec![
+            Token::Number(numbers[0]),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::LeftParenthesis,
+            Token::UnaryOperator(UnaryOperator::Minus),
+            Token::Number(numbers[1]),
+            Token::BinaryOperator(BinaryOperator::Divide),
+            Token::Number(numbers[2]),
+            Token::RightParenthesis,
+            Token::BinaryOperator(BinaryOperator::Multiply),
+            Token::Number(numbers[3]),
+        ];
 
-                match tokens[0] {
-                    Token::Number(number) => assert_eq!(number, numbers[0]),
-                    _ => assert!(false),
-                }
+        let infix = Infix::new(expression);
 
-                match tokens[1] {
-                    Token::BinaryOperator(operator) => assert_eq!(operator, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-
-                match tokens[2] {
-                    Token::LeftParenthesis => assert!(true),
-                    _ => assert!(false),
-                }
-
-                match tokens[3] {
-                    Token::UnaryOperator(operator) => assert_eq!(operator, UnaryOperator::Minus),
-                    _ => assert!(false),
-                }
-
-                match tokens[4] {
-                    Token::Number(number) => assert_eq!(number, numbers[1]),
-                    _ => assert!(false),
-                }
-
-                match tokens[5] {
-                    Token::BinaryOperator(operator) => assert_eq!(operator, BinaryOperator::Divide),
-                    _ => assert!(false),
-                }
-
-                match tokens[6] {
-                    Token::Number(number) => assert_eq!(number, numbers[2]),
-                    _ => assert!(false),
-                }
-
-                match tokens[7] {
-                    Token::RightParenthesis => assert!(true),
-                    _ => assert!(false),
-                }
-
-                match tokens[8] {
-                    Token::BinaryOperator(operator) => {
-                        assert_eq!(operator, BinaryOperator::Multiply)
-                    }
-                    _ => assert!(false),
-                }
-
-                match tokens[9] {
-                    Token::Number(number) => assert_eq!(number, numbers[3]),
-                    _ => assert!(false),
-                }
-            }
+        match infix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_tokenization_expression_with_function_and_number() {
+    fn test_infix_expression_with_function_and_number() {
         let expression: &str = "sqrt(9.0)";
         let number_ref: f64 = 9.0;
 
-        match tokenize(expression) {
-            Ok(tokens) => {
-                assert_eq!(tokens.len(), 4);
+        let tokens: Vec<Token> = vec![
+            Token::Function(Function::Sqrt),
+            Token::LeftParenthesis,
+            Token::Number(number_ref),
+            Token::RightParenthesis,
+        ];
 
-                match tokens[0] {
-                    Token::Function(fun) => assert_eq!(fun, Function::Sqrt),
-                    _ => assert!(false),
-                }
+        let infix = Infix::new(expression);
 
-                match tokens[1] {
-                    Token::LeftParenthesis => assert!(true),
-                    _ => assert!(false),
-                }
-
-                match tokens[2] {
-                    Token::Number(number) => assert_eq!(number, number_ref),
-                    _ => assert!(false),
-                }
-
-                match tokens[3] {
-                    Token::RightParenthesis => assert!(true),
-                    _ => assert!(false),
-                }
-            }
+        match infix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_tokenization_expression_with_constant_and_number() {
+    fn test_infix_expression_with_constant_and_number() {
         let expression: &str = "pi / 2.0";
         let number_ref: f64 = 2.0;
 
-        match tokenize(expression) {
-            Ok(tokens) => {
-                assert_eq!(tokens.len(), 3);
+        let tokens: Vec<Token> = vec![
+            Token::Constant(PI),
+            Token::BinaryOperator(BinaryOperator::Divide),
+            Token::Number(number_ref),
+        ];
 
-                match tokens[0] {
-                    Token::Constant(constant) => assert_eq!(constant, PI),
-                    _ => assert!(false),
-                }
+        let infix = Infix::new(expression);
 
-                match tokens[1] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Divide),
-                    _ => assert!(false),
-                }
-
-                match tokens[2] {
-                    Token::Number(number) => assert_eq!(number, number_ref),
-                    _ => assert!(false),
-                }
-            }
+        match infix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_tokenization_expression_with_all() {
+    fn test_infix_expression_with_all() {
         let expression: &str = "sin(2.0 - pi) * cos((-pi + 2.0) / 2.0)";
         let number_ref: f64 = 2.0;
 
-        match tokenize(expression) {
-            Ok(tokens) => {
-                assert_eq!(tokens.len(), 18);
+        let tokens: Vec<Token> = vec![
+            Token::Function(Function::Sin),
+            Token::LeftParenthesis,
+            Token::Number(number_ref),
+            Token::BinaryOperator(BinaryOperator::Minus),
+            Token::Constant(PI),
+            Token::RightParenthesis,
+            Token::BinaryOperator(BinaryOperator::Multiply),
+            Token::Function(Function::Cos),
+            Token::LeftParenthesis,
+            Token::LeftParenthesis,
+            Token::UnaryOperator(UnaryOperator::Minus),
+            Token::Constant(PI),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(number_ref),
+            Token::RightParenthesis,
+            Token::BinaryOperator(BinaryOperator::Divide),
+            Token::Number(number_ref),
+            Token::RightParenthesis,
+        ];
 
-                match tokens[0] {
-                    Token::Function(fun) => assert_eq!(fun, Function::Sin),
-                    _ => assert!(false),
-                }
+        let infix = Infix::new(expression);
 
-                match tokens[1] {
-                    Token::LeftParenthesis => assert!(true),
-                    _ => assert!(false),
-                }
-
-                match tokens[2] {
-                    Token::Number(number) => assert_eq!(number, number_ref),
-                    _ => assert!(false),
-                }
-
-                match tokens[3] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Minus),
-                    _ => assert!(false),
-                }
-
-                match tokens[4] {
-                    Token::Constant(constant) => assert_eq!(constant, PI),
-                    _ => assert!(false),
-                }
-
-                match tokens[5] {
-                    Token::RightParenthesis => assert!(true),
-                    _ => assert!(false),
-                }
-
-                match tokens[6] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Multiply),
-                    _ => assert!(false),
-                }
-
-                match tokens[7] {
-                    Token::Function(fun) => assert_eq!(fun, Function::Cos),
-                    _ => assert!(false),
-                }
-
-                match tokens[8] {
-                    Token::LeftParenthesis => assert!(true),
-                    _ => assert!(false),
-                }
-
-                match tokens[9] {
-                    Token::LeftParenthesis => assert!(true),
-                    _ => assert!(false),
-                }
-
-                match tokens[10] {
-                    Token::UnaryOperator(ops) => assert_eq!(ops, UnaryOperator::Minus),
-                    _ => assert!(false),
-                }
-
-                match tokens[11] {
-                    Token::Constant(constant) => assert_eq!(constant, PI),
-                    _ => assert!(false),
-                }
-
-                match tokens[12] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-
-                match tokens[13] {
-                    Token::Number(number) => assert_eq!(number, number_ref),
-                    _ => assert!(false),
-                }
-
-                match tokens[14] {
-                    Token::RightParenthesis => assert!(true),
-                    _ => assert!(false),
-                }
-
-                match tokens[15] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Divide),
-                    _ => assert!(false),
-                }
-
-                match tokens[16] {
-                    Token::Number(number) => assert_eq!(number, number_ref),
-                    _ => assert!(false),
-                }
-
-                match tokens[17] {
-                    Token::RightParenthesis => assert!(true),
-                    _ => assert!(false),
-                }
-            }
+        match infix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
