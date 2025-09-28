@@ -28,25 +28,57 @@ pub trait TokenIterator {
         return Ok(next_token == Token::Stop);
     }
 
-    /// Collect all token into vector
-    /// If a error occurs during the collect, we return an error message in Err of the result.
+    /// Filter token according to predicat
+    /// The function return an TokenIterator that return filtered token
     #[cfg(test)]
-    fn collect_all_tokens(mut self) -> Result<Vec<Token>, String>
+    fn filter<P>(self, predicat: P) -> FilterToken<Self, P>
     where
         Self: Sized,
+        P: Fn(Token) -> bool,
     {
-        let mut tokens: Vec<Token> = Vec::with_capacity(25);
+        return FilterToken::new(self, predicat);
+    }
+}
 
-        let mut token: Token = self.next_token()?;
+/// Filter token iterator
+#[cfg(test)]
+pub struct FilterToken<T, P>
+where
+    T: TokenIterator,
+    P: Fn(Token) -> bool,
+{
+    token_iterator: T,
+    predicat: P,
+}
 
-        while token != Token::Stop {
-            if token != Token::Empty {
-                tokens.push(token);
-            }
+#[cfg(test)]
+impl<T, P> FilterToken<T, P>
+where
+    T: TokenIterator,
+    P: Fn(Token) -> bool,
+{
+    /// Create FilterToken iterator from another TokenIterator and a predicat
+    pub fn new(token_iterator: T, predicat: P) -> Self {
+        return Self {
+            token_iterator,
+            predicat,
+        };
+    }
+}
 
-            token = self.next_token()?;
+#[cfg(test)]
+impl<T, P> TokenIterator for FilterToken<T, P>
+where
+    T: TokenIterator,
+    P: Fn(Token) -> bool,
+{
+    fn next_token(&mut self) -> Result<Token, String> {
+        let mut token: Token = self.token_iterator.next_token()?;
+
+        while !(self.predicat)(token) {
+            token = self.token_iterator.next_token()?;
         }
 
-        return Ok(tokens);
+        return Ok(token);
     }
 }

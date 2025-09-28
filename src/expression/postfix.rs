@@ -166,82 +166,59 @@ mod tests {
         }
     }
 
-    fn infix_to_postfix(tokens: &mut Vec<Token>) -> Result<Vec<Token>, String> {
-        let postfix_iterator = Postfix::new(MockInfix::new(tokens));
-        return postfix_iterator.collect_all_tokens();
-    }
-
     #[test]
-    fn test_infix_to_postfix_expression_with_numbers_plus_operator() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_with_numbers_plus_operator() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::Number(2.0),
             Token::BinaryOperator(BinaryOperator::Plus),
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 3);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Number(number) => assert_eq!(number, 2.0),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Number(2.0),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[2] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_with_numbers_plus_operator_minus_unary_operator() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_with_numbers_plus_operator_minus_unary_operator() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::UnaryOperator(UnaryOperator::Minus),
             Token::Number(2.0),
             Token::BinaryOperator(BinaryOperator::Plus),
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 4);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Number(number) => assert_eq!(number, 2.0),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Number(2.0),
+            Token::UnaryOperator(UnaryOperator::Minus),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::UnaryOperator(ops) => assert_eq!(ops, UnaryOperator::Minus),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[2] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[3] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_with_numbers_plus_operators() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_with_numbers_plus_operators() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
             Token::Number(2.0),
@@ -251,52 +228,29 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 7);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Number(number) => assert_eq!(number, 8.0),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Number(8.0),
+            Token::Number(2.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(9.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::Number(number) => assert_eq!(number, 2.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[2] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[3] {
-                    Token::Number(number) => assert_eq!(number, 9.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[4] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[5] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[6] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_with_numbers_plus_multiply_operators() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_with_numbers_plus_multiply_operators() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
             Token::Number(9.0),
@@ -306,52 +260,29 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 7);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Number(number) => assert_eq!(number, 8.0),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Number(8.0),
+            Token::Number(9.0),
+            Token::Number(2.0),
+            Token::BinaryOperator(BinaryOperator::Multiply),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::Number(number) => assert_eq!(number, 9.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[2] {
-                    Token::Number(number) => assert_eq!(number, 2.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[3] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Multiply),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[4] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[5] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[6] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_with_numbers_minus_divide_operators() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_with_numbers_minus_divide_operators() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Divide),
             Token::Number(2.0),
@@ -361,52 +292,29 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 7);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Number(number) => assert_eq!(number, 8.0),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Number(8.0),
+            Token::Number(2.0),
+            Token::BinaryOperator(BinaryOperator::Divide),
+            Token::Number(9.0),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Divide),
+            Token::BinaryOperator(BinaryOperator::Minus),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::Number(number) => assert_eq!(number, 2.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[2] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Divide),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[3] {
-                    Token::Number(number) => assert_eq!(number, 9.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[4] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[5] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Divide),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[6] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Minus),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_with_numbers_plus_multiply_operators_parenthesis() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_with_numbers_plus_multiply_operators_parenthesis() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::LeftParenthesis,
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
@@ -420,53 +328,30 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 7);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Number(number) => assert_eq!(number, 8.0),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Number(8.0),
+            Token::Number(2.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(9.0),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::BinaryOperator(BinaryOperator::Multiply),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::Number(number) => assert_eq!(number, 2.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[2] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[3] {
-                    Token::Number(number) => assert_eq!(number, 9.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[4] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[5] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[6] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Multiply),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_with_numbers_plus_multiply_divide_operators_minus_unary_operator_parenthesis(
+    fn test_postfix_expression_with_numbers_plus_multiply_divide_operators_minus_unary_operator_parenthesis(
     ) {
-        let mut tokens: Vec<Token> = vec![
+        let mut infix_tokens: Vec<Token> = vec![
             Token::LeftParenthesis,
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
@@ -481,58 +366,31 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 8);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Number(number) => assert_eq!(number, 8.0),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Number(8.0),
+            Token::Number(2.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(9.0),
+            Token::UnaryOperator(UnaryOperator::Minus),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Divide),
+            Token::BinaryOperator(BinaryOperator::Multiply),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::Number(number) => assert_eq!(number, 2.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[2] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[3] {
-                    Token::Number(number) => assert_eq!(number, 9.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[4] {
-                    Token::UnaryOperator(ops) => assert_eq!(ops, UnaryOperator::Minus),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[5] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[6] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Divide),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[7] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Multiply),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_with_numbers_plus_multiply_divide_minus_power_operators_parenthesis(
-    ) {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_with_numbers_plus_multiply_divide_minus_power_operators_parenthesis()
+    {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::Number(3.0),
             Token::BinaryOperator(BinaryOperator::Plus),
             Token::Number(4.0),
@@ -550,82 +408,35 @@ mod tests {
             Token::Number(3.0),
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 13);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Number(3.0),
+            Token::Number(4.0),
+            Token::Number(2.0),
+            Token::BinaryOperator(BinaryOperator::Multiply),
+            Token::Number(1.0),
+            Token::Number(5.0),
+            Token::BinaryOperator(BinaryOperator::Minus),
+            Token::Number(2.0),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Power),
+            Token::BinaryOperator(BinaryOperator::Power),
+            Token::BinaryOperator(BinaryOperator::Divide),
+            Token::BinaryOperator(BinaryOperator::Plus),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::Number(number) => assert_eq!(number, 4.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[2] {
-                    Token::Number(number) => assert_eq!(number, 2.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[3] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Multiply),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[4] {
-                    Token::Number(number) => assert_eq!(number, 1.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[5] {
-                    Token::Number(number) => assert_eq!(number, 5.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[6] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Minus),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[7] {
-                    Token::Number(number) => assert_eq!(number, 2.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[8] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[9] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Power),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[10] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Power),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[11] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Divide),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[12] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Plus),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_with_numbers_divide_multiply_operators_functions() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_with_numbers_divide_multiply_operators_functions() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::Function(Function::Sin),
             Token::LeftParenthesis,
             Token::Function(Function::Sqrt),
@@ -639,52 +450,29 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 7);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Number(number) => assert_eq!(number, 9.0),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Number(9.0),
+            Token::Function(Function::Sqrt),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Divide),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Multiply),
+            Token::Function(Function::Sin),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::Function(fun) => assert_eq!(fun, Function::Sqrt),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[2] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[3] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Divide),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[4] {
-                    Token::Number(number) => assert_eq!(number, 3.0),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[5] {
-                    Token::BinaryOperator(ops) => assert_eq!(ops, BinaryOperator::Multiply),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[6] {
-                    Token::Function(fun) => assert_eq!(fun, Function::Sin),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_with_numbers_minus_unary_operator_function() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_with_numbers_minus_unary_operator_function() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::Function(Function::Acos),
             Token::LeftParenthesis,
             Token::UnaryOperator(UnaryOperator::Minus),
@@ -692,59 +480,49 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 3);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Number(number) => assert_eq!(number, 1.0),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Number(1.0),
+            Token::UnaryOperator(UnaryOperator::Minus),
+            Token::Function(Function::Acos),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::UnaryOperator(ops) => assert_eq!(ops, UnaryOperator::Minus),
-                    _ => assert!(false),
-                }
-
-                match tokens_postfix[2] {
-                    Token::Function(fun) => assert_eq!(fun, Function::Acos),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_with_constant_function() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_with_constant_function() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::Function(Function::Cos),
             Token::LeftParenthesis,
             Token::Constant(constants::PI),
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(tokens_postfix) => {
-                assert_eq!(tokens_postfix.len(), 2);
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
 
-                match tokens_postfix[0] {
-                    Token::Constant(number) => assert_eq!(number, constants::PI),
-                    _ => assert!(false),
-                }
+        let tokens: Vec<Token> = vec![
+            Token::Constant(constants::PI),
+            Token::Function(Function::Cos),
+        ];
 
-                match tokens_postfix[1] {
-                    Token::Function(fun) => assert_eq!(fun, Function::Cos),
-                    _ => assert!(false),
-                }
-            }
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
             Err(_) => assert!(false),
         }
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_forgot_left_parenthesis() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_forgot_left_parenthesis() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::LeftParenthesis,
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
@@ -757,15 +535,32 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(_tokens_postfix) => assert!(false),
-            Err(message) => assert!(message.len() > 0),
+        let mut postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
+
+        let mut result_token: Result<Token, String> = postfix.next_token();
+
+        // You must have an error at the end
+        loop {
+            match result_token {
+                Ok(token) => {
+                    if token != Token::Stop {
+                        result_token = postfix.next_token();
+                    } else {
+                        break;
+                    }
+                }
+                Err(_) => break,
+            }
         }
+
+        assert!(result_token.is_err());
     }
 
     #[test]
-    fn test_infix_to_postfix_expression_forgot_right_parenthesis() {
-        let mut tokens: Vec<Token> = vec![
+    fn test_postfix_expression_forgot_right_parenthesis() {
+        let mut infix_tokens: Vec<Token> = vec![
             Token::LeftParenthesis,
             Token::Number(8.0),
             Token::BinaryOperator(BinaryOperator::Plus),
@@ -778,9 +573,26 @@ mod tests {
             Token::RightParenthesis,
         ];
 
-        match infix_to_postfix(&mut tokens) {
-            Ok(_tokens_postfix) => assert!(false),
-            Err(message) => assert!(message.len() > 0),
+        let mut postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
+
+        let mut result_token: Result<Token, String> = postfix.next_token();
+
+        // You must have an error at the end
+        loop {
+            match result_token {
+                Ok(token) => {
+                    if token != Token::Stop {
+                        result_token = postfix.next_token();
+                    } else {
+                        break;
+                    }
+                }
+                Err(_) => break,
+            }
         }
+
+        assert!(result_token.is_err());
     }
 }
