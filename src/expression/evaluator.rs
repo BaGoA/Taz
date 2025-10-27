@@ -1,6 +1,7 @@
 use crate::expression::token_iterator::TokenIterator;
 use crate::token::Token;
 
+/// Evaluator of postfix expression implementing TokenIterator trait
 pub struct Evaluator<T>
 where
     T: TokenIterator,
@@ -12,6 +13,7 @@ impl<T> Evaluator<T>
 where
     T: TokenIterator,
 {
+    /// Create an evaluator from token iterator
     pub fn new(postfix_iterator: T) -> Self {
         return Self { postfix_iterator };
     }

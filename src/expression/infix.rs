@@ -51,7 +51,7 @@ fn extract_word(char_it: &mut Peekable<Chars<'_>>) -> String {
     return extract_if(char_it, |c: char| c.is_alphanumeric() || c == '_');
 }
 
-/// Infix is an iterator over tokens of an infix expression
+/// Infix is an iterator over tokens from an infix expression
 pub struct Infix<'a> {
     chars_iterator: Peekable<Chars<'a>>,
     last_extracted_token: Token,

@@ -22,7 +22,7 @@ fn last_operator_is_primary(token_ops: Token, current_ops: BinaryOperator) -> bo
     }
 }
 
-/// Postfix is an iterator over tokens of an postfix expression
+/// Postfix is an iterator over tokens from an postfix expression
 pub struct Postfix<T>
 where
     T: TokenIterator,
@@ -36,6 +36,7 @@ impl<T> Postfix<T>
 where
     T: TokenIterator,
 {
+    /// Create Postfix iterator from token iterator
     pub fn new(infix_iterator: T) -> Self {
         return Self {
             infix_iterator,
@@ -44,6 +45,8 @@ where
         };
     }
 
+    /// Evaluate the postfix expression
+    /// If an error occurs during the evaluation, we return an error message in Err of the result.
     pub fn evaluate(self) -> Result<f64, String> {
         return Evaluator::new(self).evaluate();
     }

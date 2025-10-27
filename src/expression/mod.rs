@@ -15,7 +15,7 @@ impl<'a> Expression<'a> {
         return Self { raw_expression };
     }
 
-    /// Create infix expression by returning Infix iterator
+    /// Create infix expression by returning Infix token iterator
     pub fn infix(self) -> infix::Infix<'a> {
         return infix::Infix::new(self.raw_expression);
     }

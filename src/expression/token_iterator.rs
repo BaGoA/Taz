@@ -3,7 +3,7 @@ use crate::token::Token;
 /// Trait to specify an iterator over set of token
 pub trait TokenIterator {
     /// Get the next token.
-    /// If a error occurs during the iteration, we return an error message in Err of the result.
+    /// If an error occurs during the iteration, we return an error message in Err of the result.
     fn next_token(&mut self) -> Result<Token, String>;
 
     /// Determines if the elements of this TokenIterator are equal to to those of vector of tokens
