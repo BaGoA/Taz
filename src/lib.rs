@@ -3,6 +3,8 @@
 //! Taz is Rust library to evaluate a mathematical expression.
 //!
 
+pub mod error;
+
 mod expression;
 mod token;
 
@@ -17,12 +19,12 @@ mod token;
 ///
 /// let expression: String = String::from("2.0 * (4.43 - 5.99) / 3.0");
 ///
-/// let result: Result<f64, String> = taz::evaluate(expression.as_str());
+/// let result: Result<f64, taz::error::Error> = taz::evaluate(expression.as_str());
 /// assert!(result.is_ok());
 ///
 /// match result {
 ///     Ok(value) => println!("{expression} = {value}"),
-///     Err(message) => println!("Error occured: {message}")
+///     Err(error) => println!("Error occured: {}", error.message())
 /// }
 /// ```
 ///
@@ -32,16 +34,16 @@ mod token;
 ///
 /// let expression: String = String::from("cos(pi / 4.0)^2 + sin(pi / 4.0)^2");
 ///
-/// let result: Result<f64, String> = taz::evaluate(expression.as_str());
+/// let result: Result<f64, taz::error::Error> = taz::evaluate(expression.as_str());
 /// assert!(result.is_ok());
 ///
 /// match result {
 ///     Ok(value) => println!("{expression} = {value}"),
-///     Err(message) => println!("Error occured: {message}")
+///     Err(error) => println!("Error occured: {}", error.message())
 /// }
 ///
 /// ```
-pub fn evaluate(raw_expression: &str) -> Result<f64, String> {
+pub fn evaluate(raw_expression: &str) -> Result<f64, error::Error> {
     let expression = expression::Expression::new(raw_expression);
     return expression.evaluate();
 }

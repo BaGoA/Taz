@@ -1,3 +1,4 @@
+use crate::error::Error;
 use crate::expression::token_iterator::TokenIterator;
 use crate::token::constants::*;
 use crate::token::functions::Function;
@@ -37,12 +38,12 @@ fn extract_if(
 
 /// Extract a number from string given by user via its char iterator
 /// If we don't find a number, we return an error message in Err of the result.
-fn extract_number(chars_iterator: &mut Peekable<Chars<'_>>) -> Result<f64, String> {
+fn extract_number(chars_iterator: &mut Peekable<Chars<'_>>) -> Result<f64, Error> {
     let str_number: String = extract_if(chars_iterator, |c: char| c.is_digit(10) || c == '.');
 
     return str_number
         .parse()
-        .map_err(|err: ParseFloatError| err.to_string());
+        .map_err(|err: ParseFloatError| Error::CannotParseFloat(err.to_string()));
 }
 
 /// Extract a word from string given by user via its char iterator
@@ -85,8 +86,8 @@ impl<'a> Infix<'a> {
 }
 
 impl TokenIterator for Infix<'_> {
-    fn next_token(&mut self) -> Result<Token, String> {
-        let mut next_token: Result<Token, String> = Ok(Token::Stop);
+    fn next_token(&mut self) -> Result<Token, Error> {
+        let mut next_token: Result<Token, Error> = Ok(Token::Stop);
 
         let reach_the_end: bool = skip_whitespace(&mut self.chars_iterator);
 
@@ -123,16 +124,10 @@ impl TokenIterator for Infix<'_> {
                     } else if Function::is_fun(name.as_str()) {
                         Token::new_function(name.as_str())
                     } else {
-                        Err(format!(
-                            "The string {} does not correspond to existing tokens",
-                            name
-                        ))
+                        Err(Error::WordDoesNotMatchWithToken(name))
                     }
                 } else {
-                    next_token = Err(format!(
-                        "The character {} does not correspond to existing tokens",
-                        c
-                    ))
+                    next_token = Err(Error::CharacterDoesNotMatchWithToken(*c))
                 }
             }
             None => (),

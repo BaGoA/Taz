@@ -1,3 +1,5 @@
+use crate::error::Error;
+
 mod token_iterator;
 
 mod evaluator;
@@ -18,7 +20,7 @@ impl<'a> Expression<'a> {
     /// Evaluate the expression
     /// If error occurs during evaluation, an error message is stored
     /// in string contained in Result output
-    pub fn evaluate(self) -> Result<f64, String> {
+    pub fn evaluate(self) -> Result<f64, Error> {
         return evaluator::evaluate(postfix::Postfix::new(infix::Infix::new(
             self.raw_expression,
         )));

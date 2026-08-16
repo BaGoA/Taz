@@ -1,14 +1,15 @@
+use crate::error::Error;
 use crate::token::Token;
 
 /// Trait to specify an iterator over set of token
 pub trait TokenIterator {
     /// Get the next token.
     /// If an error occurs during the iteration, we return an error message in Err of the result.
-    fn next_token(&mut self) -> Result<Token, String>;
+    fn next_token(&mut self) -> Result<Token, Error>;
 
     /// Determines if the elements of this TokenIterator are equal to to those of vector of tokens
     #[cfg(test)]
-    fn equal(mut self, tokens: &[Token]) -> Result<bool, String>
+    fn equal(mut self, tokens: &[Token]) -> Result<bool, Error>
     where
         Self: Sized,
     {
@@ -72,7 +73,7 @@ where
     T: TokenIterator,
     P: Fn(Token) -> bool,
 {
-    fn next_token(&mut self) -> Result<Token, String> {
+    fn next_token(&mut self) -> Result<Token, Error> {
         let mut token: Token = self.token_iterator.next_token()?;
 
         while !(self.predicat)(token) {

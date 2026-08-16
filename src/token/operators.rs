@@ -1,3 +1,5 @@
+use crate::error::Error;
+
 /// Available binary operators used library
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum BinaryOperator {
@@ -12,14 +14,14 @@ impl BinaryOperator {
     /// Create a BinaryOperator from a char
     /// If char given in argument does not correspond to operator,
     /// an error message is stored in string contained in Result output
-    pub fn from_char(ops: char) -> Result<BinaryOperator, String> {
+    pub fn from_char(ops: char) -> Result<BinaryOperator, Error> {
         match ops {
             '+' => Ok(BinaryOperator::Plus),
             '-' => Ok(BinaryOperator::Minus),
             '*' => Ok(BinaryOperator::Multiply),
             '/' => Ok(BinaryOperator::Divide),
             '^' => Ok(BinaryOperator::Power),
-            _ => Err(String::from("Unknown operator characters")),
+            _ => Err(Error::UnknownBinaryOperatorCharacter),
         }
     }
 
@@ -60,7 +62,7 @@ impl BinaryOperator {
     /// Apply the operation on two values given in argument.
     /// For division case, we check that right_operand is non-null.
     /// To take into account this error, the function return a Result<f64, String>
-    pub fn apply(&self, left_operand: f64, right_operand: f64) -> Result<f64, String> {
+    pub fn apply(&self, left_operand: f64, right_operand: f64) -> Result<f64, Error> {
         match self {
             BinaryOperator::Plus => Ok(left_operand + right_operand),
             BinaryOperator::Minus => Ok(left_operand - right_operand),
@@ -69,7 +71,7 @@ impl BinaryOperator {
                 if right_operand != 0.0 {
                     return Ok(left_operand / right_operand);
                 } else {
-                    return Err(String::from("Division by zero"));
+                    return Err(Error::DivisionByZero);
                 }
             }
             BinaryOperator::Power => Ok(left_operand.powf(right_operand)),
@@ -88,11 +90,11 @@ impl UnaryOperator {
     /// Create a UnaryOperator from a char
     /// If char given in argument does not correspond to operator,
     /// an error message is stored in string contained in Result output
-    pub fn from_char(ops: char) -> Result<UnaryOperator, String> {
+    pub fn from_char(ops: char) -> Result<UnaryOperator, Error> {
         match ops {
             '+' => Ok(UnaryOperator::Plus),
             '-' => Ok(UnaryOperator::Minus),
-            _ => Err(String::from("Unknown operator characters")),
+            _ => Err(Error::UnknownUnaryOperatorCharacter),
         }
     }
 
@@ -121,46 +123,46 @@ mod tests {
 
     #[test]
     fn test_binary_operator_from_plus_char() {
-        let res_plus: Result<BinaryOperator, String> = BinaryOperator::from_char('+');
+        let res_plus: Result<BinaryOperator, Error> = BinaryOperator::from_char('+');
         assert!(res_plus.is_ok());
         assert_eq!(res_plus.unwrap(), BinaryOperator::Plus);
     }
 
     #[test]
     fn test_binary_operator_from_minus_char() {
-        let res_minus: Result<BinaryOperator, String> = BinaryOperator::from_char('-');
+        let res_minus: Result<BinaryOperator, Error> = BinaryOperator::from_char('-');
         assert!(res_minus.is_ok());
         assert_eq!(res_minus.unwrap(), BinaryOperator::Minus);
     }
 
     #[test]
     fn test_binary_operator_from_multiply_char() {
-        let res_multiply: Result<BinaryOperator, String> = BinaryOperator::from_char('*');
+        let res_multiply: Result<BinaryOperator, Error> = BinaryOperator::from_char('*');
         assert!(res_multiply.is_ok());
         assert_eq!(res_multiply.unwrap(), BinaryOperator::Multiply);
     }
 
     #[test]
     fn test_binary_operator_from_divide_char() {
-        let res_divide: Result<BinaryOperator, String> = BinaryOperator::from_char('/');
+        let res_divide: Result<BinaryOperator, Error> = BinaryOperator::from_char('/');
         assert!(res_divide.is_ok());
         assert_eq!(res_divide.unwrap(), BinaryOperator::Divide);
     }
 
     #[test]
     fn test_binary_operator_from_power_char() {
-        let res_power: Result<BinaryOperator, String> = BinaryOperator::from_char('^');
+        let res_power: Result<BinaryOperator, Error> = BinaryOperator::from_char('^');
         assert!(res_power.is_ok());
         assert_eq!(res_power.unwrap(), BinaryOperator::Power);
     }
 
     #[test]
     fn test_binary_operator_from_unknown_char() {
-        let res_unknown: Result<BinaryOperator, String> = BinaryOperator::from_char('!');
+        let res_unknown: Result<BinaryOperator, Error> = BinaryOperator::from_char('!');
         assert!(res_unknown.is_err());
         assert_eq!(
             res_unknown.err(),
-            Some(String::from("Unknown operator characters"))
+            Some(Error::UnknownBinaryOperatorCharacter)
         );
     }
 
@@ -268,10 +270,10 @@ mod tests {
         let right_operand: f64 = 0.0;
 
         let ops_divide: BinaryOperator = BinaryOperator::Divide;
-        let res_divide: Result<f64, String> = ops_divide.apply(left_operand, right_operand);
+        let res_divide: Result<f64, Error> = ops_divide.apply(left_operand, right_operand);
 
         assert!(res_divide.is_err());
-        assert_eq!(res_divide.err(), Some(String::from("Division by zero")));
+        assert_eq!(res_divide.err(), Some(Error::DivisionByZero));
     }
 
     #[test]
@@ -289,14 +291,14 @@ mod tests {
 
     #[test]
     fn test_unary_operator_from_plus_char() {
-        let res_plus: Result<UnaryOperator, String> = UnaryOperator::from_char('+');
+        let res_plus: Result<UnaryOperator, Error> = UnaryOperator::from_char('+');
         assert!(res_plus.is_ok());
         assert_eq!(res_plus.unwrap(), UnaryOperator::Plus);
     }
 
     #[test]
     fn test_unary_operator_from_minus_char() {
-        let res_minus: Result<UnaryOperator, String> = UnaryOperator::from_char('-');
+        let res_minus: Result<UnaryOperator, Error> = UnaryOperator::from_char('-');
         assert!(res_minus.is_ok());
         assert_eq!(res_minus.unwrap(), UnaryOperator::Minus);
     }

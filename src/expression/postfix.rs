@@ -1,3 +1,4 @@
+use crate::error::Error;
 use crate::expression::token_iterator::TokenIterator;
 use crate::token::operators::BinaryOperator;
 use crate::token::Token;
@@ -49,7 +50,7 @@ impl<T> TokenIterator for Postfix<T>
 where
     T: TokenIterator,
 {
-    fn next_token(&mut self) -> Result<Token, String> {
+    fn next_token(&mut self) -> Result<Token, Error> {
         if !self.primary_operator.is_empty() {
             let token: Token = self.primary_operator[0];
             self.primary_operator.remove(0);
@@ -102,7 +103,7 @@ where
                 }
 
                 if self.stack_operator.is_empty() {
-                    return Err(String::from("Mismatched parenthesis"));
+                    return Err(Error::MismatchedParenthesis);
                 }
 
                 // Pop left parenthesis and function from stack operator
@@ -126,7 +127,7 @@ where
                     return Ok(Token::Stop);
                 } else {
                     if self.stack_operator.contains(&Token::LeftParenthesis) {
-                        return Err(String::from("Mismatched parenthesis"));
+                        return Err(Error::MismatchedParenthesis);
                     }
 
                     return Ok(self.stack_operator.pop().unwrap());
@@ -156,7 +157,7 @@ mod tests {
     }
 
     impl<'a> TokenIterator for MockInfix<'a> {
-        fn next_token(&mut self) -> Result<Token, String> {
+        fn next_token(&mut self) -> Result<Token, Error> {
             return match self.tokens.next() {
                 Some(&mut token) => Ok(token),
                 None => Ok(Token::Stop),
@@ -537,7 +538,7 @@ mod tests {
             return token != Token::Empty;
         });
 
-        let mut result_token: Result<Token, String> = postfix.next_token();
+        let mut result_token: Result<Token, Error> = postfix.next_token();
 
         // You must have an error at the end
         loop {
@@ -575,7 +576,7 @@ mod tests {
             return token != Token::Empty;
         });
 
-        let mut result_token: Result<Token, String> = postfix.next_token();
+        let mut result_token: Result<Token, Error> = postfix.next_token();
 
         // You must have an error at the end
         loop {
