@@ -1,10 +1,11 @@
+use crate::error::Error;
 use crate::expression::token_iterator::TokenIterator;
 use crate::token::Token;
 
 /// Evaluate postfix expression through its iterator
 /// If error occurs during evaluation, an error message is stored
 /// in string contained in Result output
-pub fn evaluate(mut postfix_iterator: impl TokenIterator) -> Result<f64, String> {
+pub fn evaluate(mut postfix_iterator: impl TokenIterator) -> Result<f64, Error> {
     let mut stack_operand: Vec<f64> = Vec::with_capacity(10);
     let mut token: Token = postfix_iterator.next_token()?;
 
@@ -16,36 +17,30 @@ pub fn evaluate(mut postfix_iterator: impl TokenIterator) -> Result<f64, String>
                     if let Some(left) = stack_operand.pop() {
                         stack_operand.push(ops.apply(left, right)?);
                     } else {
-                        return Err(String::from(
-                            "Missing left operand to apply binary operation",
-                        ));
+                        return Err(Error::MissingLeftOperandForBinaryOperator);
                     }
                 } else {
-                    return Err(String::from(
-                        "Missing right operand to apply binary operation",
-                    ));
+                    return Err(Error::MissingRightOperandForBinaryOperator);
                 }
             }
             Token::UnaryOperator(ops) => {
                 if let Some(number) = stack_operand.pop() {
                     stack_operand.push(ops.apply(number));
                 } else {
-                    return Err(String::from("Missing operand to apply unary operation"));
+                    return Err(Error::MissingOperandForUnaryOperator);
                 }
             }
             Token::Function(fun) => {
                 if let Some(arg) = stack_operand.pop() {
                     stack_operand.push(fun.apply(arg)?);
                 } else {
-                    return Err(String::from("Missing argument to apply function"));
+                    return Err(Error::MissingArgumentForFunction);
                 }
             }
             Token::Constant(constant) => stack_operand.push(constant),
             Token::Empty => (),
             _ => {
-                return Err(String::from(
-                    "Token non-accepted for evaluation of postfix expression",
-                ));
+                return Err(Error::UnacceptableToken);
             }
         }
 
@@ -87,7 +82,7 @@ mod tests {
     }
 
     impl<'a> TokenIterator for MockPostfix<'a> {
-        fn next_token(&mut self) -> Result<Token, String> {
+        fn next_token(&mut self) -> Result<Token, Error> {
             return match self.tokens.next() {
                 Some(&mut token) => Ok(token),
                 None => Ok(Token::Stop),
@@ -95,7 +90,7 @@ mod tests {
         }
     }
 
-    fn postfix_evaluation(tokens: &mut Vec<Token>) -> Result<f64, String> {
+    fn postfix_evaluation(tokens: &mut Vec<Token>) -> Result<f64, Error> {
         return evaluate(MockPostfix::new(tokens));
     }
 
