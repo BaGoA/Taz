@@ -1,4 +1,3 @@
-use crate::expression::evaluator::Evaluator;
 use crate::expression::token_iterator::TokenIterator;
 use crate::token::operators::BinaryOperator;
 use crate::token::Token;
@@ -44,12 +43,6 @@ where
             primary_operator: Vec::with_capacity(25),
         };
     }
-
-    /// Evaluate the postfix expression
-    /// If an error occurs during the evaluation, we return an error message in Err of the result.
-    pub fn evaluate(self) -> Result<f64, String> {
-        return Evaluator::new(self).evaluate();
-    }
 }
 
 impl<T> TokenIterator for Postfix<T>
@@ -71,6 +64,7 @@ where
             Token::Constant(_) => return Ok(infix_token),
             Token::BinaryOperator(ops) => {
                 // Pop stack operator according to last operators precedence
+                // Then fill the primary operator container to return it at next calls
                 while let Some(&stack_last) = self.stack_operator.last() {
                     if last_operator_is_primary(stack_last, ops) {
                         self.primary_operator.push(stack_last);
@@ -97,6 +91,7 @@ where
             }
             Token::RightParenthesis => {
                 // Pop stack operator between left and right parenthesis
+                // Then fill the primary operator container to return it at next calls
                 while let Some(&stack_last) = self.stack_operator.last() {
                     if stack_last != Token::LeftParenthesis {
                         self.primary_operator.push(stack_last);

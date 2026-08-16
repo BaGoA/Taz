@@ -1,4 +1,3 @@
-use crate::expression::postfix::Postfix;
 use crate::expression::token_iterator::TokenIterator;
 use crate::token::constants::*;
 use crate::token::functions::Function;
@@ -12,21 +11,21 @@ use std::str::Chars;
 
 /// Extract a substring from string given by user
 /// where each characters check a predicat
-fn extract_if<P>(char_it: &mut Peekable<Chars<'_>>, predicate: P) -> String
-where
-    P: Fn(char) -> bool,
-{
+fn extract_if(
+    chars_iterator: &mut Peekable<Chars<'_>>,
+    predicate: impl Fn(char) -> bool,
+) -> String {
     let mut substr: String = String::new();
 
     // Search maximal size that can reach the substr to reserve the memory space
-    if let (_lb_size, Some(ub_size)) = char_it.size_hint() {
+    if let (_lb_size, Some(ub_size)) = chars_iterator.size_hint() {
         substr.reserve(ub_size);
     }
 
-    while let Some(&c) = char_it.peek() {
+    while let Some(&c) = chars_iterator.peek() {
         if predicate(c) {
             substr.push(c);
-            char_it.next();
+            chars_iterator.next();
         } else {
             break;
         }
@@ -38,8 +37,8 @@ where
 
 /// Extract a number from string given by user via its char iterator
 /// If we don't find a number, we return an error message in Err of the result.
-fn extract_number(char_it: &mut Peekable<Chars<'_>>) -> Result<f64, String> {
-    let str_number: String = extract_if(char_it, |c: char| c.is_digit(10) || c == '.');
+fn extract_number(chars_iterator: &mut Peekable<Chars<'_>>) -> Result<f64, String> {
+    let str_number: String = extract_if(chars_iterator, |c: char| c.is_digit(10) || c == '.');
 
     return str_number
         .parse()
@@ -47,8 +46,24 @@ fn extract_number(char_it: &mut Peekable<Chars<'_>>) -> Result<f64, String> {
 }
 
 /// Extract a word from string given by user via its char iterator
-fn extract_word(char_it: &mut Peekable<Chars<'_>>) -> String {
-    return extract_if(char_it, |c: char| c.is_alphanumeric() || c == '_');
+fn extract_word(chars_iterator: &mut Peekable<Chars<'_>>) -> String {
+    return extract_if(chars_iterator, |c: char| c.is_alphanumeric() || c == '_');
+}
+
+/// Skip the whitespace in chars iterator
+/// It returns true if we reach the end of iterator
+fn skip_whitespace(chars_iterator: &mut Peekable<Chars<'_>>) -> bool {
+    let mut reach_the_end: bool = false;
+
+    while let Some(c) = chars_iterator.peek() {
+        if c.is_whitespace() {
+            reach_the_end = chars_iterator.next().is_none();
+        } else {
+            break;
+        }
+    }
+
+    return reach_the_end;
 }
 
 /// Infix is an iterator over tokens from an infix expression
@@ -67,30 +82,20 @@ impl<'a> Infix<'a> {
             is_first_token: true,
         };
     }
-
-    /// Create Postfix iterator from Infix iterator
-    pub fn postfix(self) -> Postfix<Self> {
-        return Postfix::<Self>::new(self);
-    }
 }
 
 impl TokenIterator for Infix<'_> {
     fn next_token(&mut self) -> Result<Token, String> {
         let mut next_token: Result<Token, String> = Ok(Token::Stop);
 
+        let reach_the_end: bool = skip_whitespace(&mut self.chars_iterator);
+
+        if reach_the_end {
+            return Ok(Token::Stop);
+        }
+
         match self.chars_iterator.peek() {
-            Some(mut c) => {
-                // Skip whitespace
-                while c.is_whitespace() {
-                    self.chars_iterator.next();
-
-                    match self.chars_iterator.peek() {
-                        Some(next_char) => c = next_char,
-                        None => return Ok(Token::Stop),
-                    }
-                }
-
-                // Extract token
+            Some(c) => {
                 if c.is_digit(10) {
                     next_token = extract_number(self.chars_iterator.by_ref())
                         .map(|number: f64| Token::new_number(number));
@@ -291,6 +296,20 @@ mod tests {
     #[test]
     fn test_infix_expression_with_number() {
         let expression: &str = "4354.75";
+        let number_ref: f64 = 4354.75;
+        let tokens: Vec<Token> = vec![Token::Number(number_ref)];
+
+        let infix = Infix::new(expression);
+
+        match infix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_infix_expression_with_number_and_whitespace_at_the_begin_and_at_the_end() {
+        let expression: &str = "   4354.75  ";
         let number_ref: f64 = 4354.75;
         let tokens: Vec<Token> = vec![Token::Number(number_ref)];
 
