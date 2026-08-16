@@ -43,7 +43,7 @@ mod token;
 /// ```
 pub fn evaluate(raw_expression: &str) -> Result<f64, String> {
     let expression = expression::Expression::new(raw_expression);
-    return expression.infix().postfix().evaluate();
+    return expression.evaluate();
 }
 
 /// Units tests
