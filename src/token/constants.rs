@@ -34,23 +34,26 @@ mod tests {
 
     #[test]
     fn test_constant_from_pi_string() {
-        let result: Result<f64, Error> = from_string("pi");
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), PI);
+        match from_string("pi") {
+            Ok(constant) => assert_eq!(constant, PI),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_constant_from_e_string() {
-        let result: Result<f64, Error> = from_string("e");
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), E);
+        match from_string("e") {
+            Ok(constant) => assert_eq!(constant, E),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_constant_from_c_string() {
-        let result: Result<f64, Error> = from_string("c");
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), C);
+        match from_string("c") {
+            Ok(constant) => assert_eq!(constant, C),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]

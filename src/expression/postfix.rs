@@ -130,14 +130,15 @@ where
             }
             _ => {
                 // Push rest of operator. If stack operator contains left parenthesis, then there is an error
-                if self.stack_operator.is_empty() {
-                    return Ok(Token::Stop);
-                } else {
-                    if self.stack_operator.contains(&Token::LeftParenthesis) {
-                        return Err(Error::MismatchedParenthesis);
-                    }
+                match self.stack_operator.pop() {
+                    Some(token) => {
+                        if self.stack_operator.contains(&Token::LeftParenthesis) {
+                            return Err(Error::MismatchedParenthesis);
+                        }
 
-                    return Ok(self.stack_operator.pop().unwrap());
+                        return Ok(token);
+                    }
+                    None => return Ok(Token::Stop),
                 }
             }
         }

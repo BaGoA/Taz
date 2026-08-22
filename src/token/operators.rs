@@ -154,7 +154,7 @@ impl ComparisonOperator {
     /// Create a ComparisonOperator from a string
     /// If string given in argument does not correspond to operator,
     /// an error message is stored in string contained in Result output
-    pub fn from_str(ops: &str) -> Result<ComparisonOperator, Error> {
+    pub fn from_string(ops: &str) -> Result<ComparisonOperator, Error> {
         match ops {
             "<" => Ok(ComparisonOperator::Lower),
             "<=" => Ok(ComparisonOperator::LowerEqual),
@@ -234,47 +234,50 @@ mod tests {
 
     #[test]
     fn test_binary_operator_from_plus_char() {
-        let res_plus: Result<BinaryOperator, Error> = BinaryOperator::from_char('+');
-        assert!(res_plus.is_ok());
-        assert_eq!(res_plus.unwrap(), BinaryOperator::Plus);
+        match BinaryOperator::from_char('+') {
+            Ok(ops) => assert_eq!(ops, BinaryOperator::Plus),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_binary_operator_from_minus_char() {
-        let res_minus: Result<BinaryOperator, Error> = BinaryOperator::from_char('-');
-        assert!(res_minus.is_ok());
-        assert_eq!(res_minus.unwrap(), BinaryOperator::Minus);
+        match BinaryOperator::from_char('-') {
+            Ok(ops) => assert_eq!(ops, BinaryOperator::Minus),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_binary_operator_from_multiply_char() {
-        let res_multiply: Result<BinaryOperator, Error> = BinaryOperator::from_char('*');
-        assert!(res_multiply.is_ok());
-        assert_eq!(res_multiply.unwrap(), BinaryOperator::Multiply);
+        match BinaryOperator::from_char('*') {
+            Ok(ops) => assert_eq!(ops, BinaryOperator::Multiply),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_binary_operator_from_divide_char() {
-        let res_divide: Result<BinaryOperator, Error> = BinaryOperator::from_char('/');
-        assert!(res_divide.is_ok());
-        assert_eq!(res_divide.unwrap(), BinaryOperator::Divide);
+        match BinaryOperator::from_char('/') {
+            Ok(ops) => assert_eq!(ops, BinaryOperator::Divide),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_binary_operator_from_power_char() {
-        let res_power: Result<BinaryOperator, Error> = BinaryOperator::from_char('^');
-        assert!(res_power.is_ok());
-        assert_eq!(res_power.unwrap(), BinaryOperator::Power);
+        match BinaryOperator::from_char('^') {
+            Ok(ops) => assert_eq!(ops, BinaryOperator::Power),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_binary_operator_from_unknown_char() {
-        let res_unknown: Result<BinaryOperator, Error> = BinaryOperator::from_char('!');
-        assert!(res_unknown.is_err());
-        assert_eq!(
-            res_unknown.err(),
-            Some(Error::UnknownBinaryOperatorCharacter)
-        );
+        match BinaryOperator::from_char('!') {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::UnknownBinaryOperatorCharacter),
+        }
     }
 
     #[test]
@@ -330,10 +333,11 @@ mod tests {
 
         let ops_plus: BinaryOperator = BinaryOperator::Plus;
         let ref_plus: f64 = 7.0;
-        assert_eq!(
-            ops_plus.apply(left_operand, right_operand).unwrap(),
-            ref_plus
-        );
+
+        match ops_plus.apply(left_operand, right_operand) {
+            Ok(value) => assert_eq!(value, ref_plus),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
@@ -343,10 +347,11 @@ mod tests {
 
         let ops_minus: BinaryOperator = BinaryOperator::Minus;
         let ref_minus: f64 = 3.0;
-        assert_eq!(
-            ops_minus.apply(left_operand, right_operand).unwrap(),
-            ref_minus
-        );
+
+        match ops_minus.apply(left_operand, right_operand) {
+            Ok(value) => assert_eq!(value, ref_minus),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
@@ -356,10 +361,11 @@ mod tests {
 
         let ops_multiply: BinaryOperator = BinaryOperator::Multiply;
         let ref_multiply: f64 = 10.0;
-        assert_eq!(
-            ops_multiply.apply(left_operand, right_operand).unwrap(),
-            ref_multiply
-        );
+
+        match ops_multiply.apply(left_operand, right_operand) {
+            Ok(value) => assert_eq!(value, ref_multiply),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
@@ -369,10 +375,11 @@ mod tests {
 
         let ops_divide: BinaryOperator = BinaryOperator::Divide;
         let ref_divide: f64 = 3.0;
-        assert_eq!(
-            ops_divide.apply(left_operand, right_operand).unwrap(),
-            ref_divide
-        );
+
+        match ops_divide.apply(left_operand, right_operand) {
+            Ok(value) => assert_eq!(value, ref_divide),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
@@ -381,10 +388,11 @@ mod tests {
         let right_operand: f64 = 0.0;
 
         let ops_divide: BinaryOperator = BinaryOperator::Divide;
-        let res_divide: Result<f64, Error> = ops_divide.apply(left_operand, right_operand);
 
-        assert!(res_divide.is_err());
-        assert_eq!(res_divide.err(), Some(Error::DivisionByZero));
+        match ops_divide.apply(left_operand, right_operand) {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::DivisionByZero),
+        }
     }
 
     #[test]
@@ -394,24 +402,27 @@ mod tests {
 
         let ops_power: BinaryOperator = BinaryOperator::Power;
         let ref_power: f64 = 25.0;
-        assert_eq!(
-            ops_power.apply(left_operand, right_operand).unwrap(),
-            ref_power
-        );
+
+        match ops_power.apply(left_operand, right_operand) {
+            Ok(value) => assert_eq!(value, ref_power),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_unary_operator_from_plus_char() {
-        let res_plus: Result<UnaryOperator, Error> = UnaryOperator::from_char('+');
-        assert!(res_plus.is_ok());
-        assert_eq!(res_plus.unwrap(), UnaryOperator::Plus);
+        match UnaryOperator::from_char('+') {
+            Ok(ops) => assert_eq!(ops, UnaryOperator::Plus),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_unary_operator_from_minus_char() {
-        let res_minus: Result<UnaryOperator, Error> = UnaryOperator::from_char('-');
-        assert!(res_minus.is_ok());
-        assert_eq!(res_minus.unwrap(), UnaryOperator::Minus);
+        match UnaryOperator::from_char('-') {
+            Ok(ops) => assert_eq!(ops, UnaryOperator::Minus),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
@@ -457,44 +468,50 @@ mod tests {
 
     #[test]
     fn test_comparison_operator_from_lower_str() {
-        let res_plus: Result<ComparisonOperator, Error> = ComparisonOperator::from_str("<");
-        assert!(res_plus.is_ok());
-        assert_eq!(res_plus.unwrap(), ComparisonOperator::Lower);
+        match ComparisonOperator::from_string("<") {
+            Ok(ops) => assert_eq!(ops, ComparisonOperator::Lower),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_comparison_operator_from_lower_equal_str() {
-        let res_plus: Result<ComparisonOperator, Error> = ComparisonOperator::from_str("<=");
-        assert!(res_plus.is_ok());
-        assert_eq!(res_plus.unwrap(), ComparisonOperator::LowerEqual);
+        match ComparisonOperator::from_string("<=") {
+            Ok(ops) => assert_eq!(ops, ComparisonOperator::LowerEqual),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_comparison_operator_from_greater_str() {
-        let res_plus: Result<ComparisonOperator, Error> = ComparisonOperator::from_str(">");
-        assert!(res_plus.is_ok());
-        assert_eq!(res_plus.unwrap(), ComparisonOperator::Greater);
+        match ComparisonOperator::from_string(">") {
+            Ok(ops) => assert_eq!(ops, ComparisonOperator::Greater),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_comparison_operator_from_greater_equal_str() {
-        let res_plus: Result<ComparisonOperator, Error> = ComparisonOperator::from_str(">=");
-        assert!(res_plus.is_ok());
-        assert_eq!(res_plus.unwrap(), ComparisonOperator::GreaterEqual);
+        match ComparisonOperator::from_string(">=") {
+            Ok(ops) => assert_eq!(ops, ComparisonOperator::GreaterEqual),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_comparison_operator_from_equal_str() {
-        let res_plus: Result<ComparisonOperator, Error> = ComparisonOperator::from_str("==");
-        assert!(res_plus.is_ok());
-        assert_eq!(res_plus.unwrap(), ComparisonOperator::Equal);
+        match ComparisonOperator::from_string("==") {
+            Ok(ops) => assert_eq!(ops, ComparisonOperator::Equal),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_comparison_operator_from_not_equal_str() {
-        let res_plus: Result<ComparisonOperator, Error> = ComparisonOperator::from_str("!=");
-        assert!(res_plus.is_ok());
-        assert_eq!(res_plus.unwrap(), ComparisonOperator::NotEqual);
+        match ComparisonOperator::from_string("!=") {
+            Ok(ops) => assert_eq!(ops, ComparisonOperator::NotEqual),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
