@@ -1,22 +1,29 @@
 use crate::error::Error;
 use crate::expression::token_iterator::TokenIterator;
-use crate::token::operators::BinaryOperator;
+use crate::token::operators::Operator;
 use crate::token::Token;
 
-/// Check if last token, which can represent an operator or left parenthesis, is primary
-/// with binary operator given in argument
-fn last_operator_is_primary(token_ops: Token, current_ops: BinaryOperator) -> bool {
-    match token_ops {
-        Token::UnaryOperator(_) => true,
-        Token::BinaryOperator(last_ops) => {
-            let last_precedence: u8 = last_ops.precedence();
-            let current_precedence: u8 = current_ops.precedence();
+/// Check if previous operator is primary with current operator
+fn previous_operator_is_primary(previous_ops: impl Operator, current_ops: impl Operator) -> bool {
+    let last_precedence: u8 = previous_ops.precedence();
+    let current_precedence: u8 = current_ops.precedence();
 
-            let is_primary: bool = last_precedence > current_precedence;
-            let is_left_associativity: bool =
-                (last_precedence == current_precedence) && current_ops.is_left_associative();
+    let is_primary: bool = last_precedence > current_precedence;
+    let is_left_associativity: bool =
+        (last_precedence == current_precedence) && current_ops.is_left_associative();
 
-            return is_primary || is_left_associativity;
+    return is_primary || is_left_associativity;
+}
+
+/// Check if previous token, which can represent an operator or left parenthesis, is primary
+/// with an operator given in argument
+fn previous_token_is_primary(previous_token: Token, current_ops: impl Operator) -> bool {
+    match previous_token {
+        Token::UnaryOperator(previous_ops) => {
+            previous_operator_is_primary(previous_ops, current_ops)
+        }
+        Token::BinaryOperator(previous_ops) => {
+            previous_operator_is_primary(previous_ops, current_ops)
         }
         _ => false,
     }
@@ -67,7 +74,7 @@ where
                 // Pop stack operator according to last operators precedence
                 // Then fill the primary operator container to return it at next calls
                 while let Some(&stack_last) = self.stack_operator.last() {
-                    if last_operator_is_primary(stack_last, ops) {
+                    if previous_token_is_primary(stack_last, ops) {
                         self.primary_operator.push(stack_last);
                         self.stack_operator.pop();
                     } else {
@@ -141,7 +148,11 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::token::{constants, functions::Function, operators::UnaryOperator};
+    use crate::token::{
+        constants,
+        functions::Function,
+        operators::{BinaryOperator, UnaryOperator},
+    };
 
     // Mock infix iterator from vector of token
     struct MockInfix<'a> {

@@ -7,6 +7,7 @@ pub enum Error {
     // operators
     UnknownBinaryOperatorCharacter,
     UnknownUnaryOperatorCharacter,
+    UnknownComparisonOperatorString,
     DivisionByZero,
 
     // functions
@@ -42,6 +43,9 @@ impl Error {
             }
             Error::UnknownUnaryOperatorCharacter => {
                 String::from("Unknown unary operator character")
+            }
+            Error::UnknownComparisonOperatorString => {
+                String::from("Unknown comparison operator string")
             }
             Error::DivisionByZero => String::from("Division by zero"),
             Error::UnknownFunctionString => String::from("Unknown function string"),
