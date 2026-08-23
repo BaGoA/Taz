@@ -11,6 +11,7 @@ pub enum Token {
     Number(f64),
     BinaryOperator(operators::BinaryOperator),
     UnaryOperator(operators::UnaryOperator),
+    ComparisonOperator(operators::ComparisonOperator),
     LeftParenthesis,
     RightParenthesis,
     Constant(f64),
@@ -26,7 +27,7 @@ impl Token {
 
     /// Create a binary operator token from char
     /// If char given in argument does not correspond to operator,
-    /// an error message is stored in string contained in Result output
+    /// an error is created in Result output
     pub fn new_binary_ops(ops: char) -> Result<Token, Error> {
         operators::BinaryOperator::from_char(ops)
             .map(|binary_ops| Token::BinaryOperator(binary_ops))
@@ -34,21 +35,29 @@ impl Token {
 
     /// Create a unary operator token from char
     /// If char given in argument does not correspond to operator,
-    /// an error message is stored in string contained in Result output
+    /// an error is created in Result output
     pub fn new_unary_ops(ops: char) -> Result<Token, Error> {
         operators::UnaryOperator::from_char(ops).map(|unary_ops| Token::UnaryOperator(unary_ops))
     }
 
+    /// Create a comparison operator token from string
+    /// If string given in argument does not correspond to operator,
+    /// an error is created in Result output
+    pub fn new_comparison_ops(ops: &str) -> Result<Token, Error> {
+        operators::ComparisonOperator::from_string(ops)
+            .map(|comparison_ops| Token::ComparisonOperator(comparison_ops))
+    }
+
     /// Create a constant token from string
     /// If string given in argument does not correspond to constants,
-    /// an error message is stored in string contained in Result output
+    /// an error is created in Result output
     pub fn new_constant(constant: &str) -> Result<Token, Error> {
         constants::from_string(constant).map(|value| Token::Constant(value))
     }
 
     /// Create a function token from string
     /// If string given in argument does not correspond to constants,
-    /// an error message is stored in string contained in Result output
+    /// an error is created in Result output
     pub fn new_function(fun_name: &str) -> Result<Token, Error> {
         functions::Function::from_string(fun_name).map(|fun| Token::Function(fun))
     }
@@ -90,6 +99,19 @@ mod tests {
         match Token::new_unary_ops('-') {
             Ok(token) => match token {
                 Token::UnaryOperator(ops) => assert_eq!(ops, ops_ref),
+                _ => assert!(false),
+            },
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_token_new_comparison_ops() {
+        let ops_ref = operators::ComparisonOperator::LowerEqual;
+
+        match Token::new_comparison_ops("<=") {
+            Ok(token) => match token {
+                Token::ComparisonOperator(ops) => assert_eq!(ops, ops_ref),
                 _ => assert!(false),
             },
             Err(_) => assert!(false),
