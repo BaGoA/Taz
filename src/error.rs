@@ -9,6 +9,7 @@ pub enum Error {
     UnknownUnaryOperatorCharacter,
     UnknownComparisonOperatorString,
     DivisionByZero,
+    MissingEqualCharacter,
 
     // functions
     UnknownFunctionString,
@@ -48,6 +49,7 @@ impl Error {
                 String::from("Unknown comparison operator string")
             }
             Error::DivisionByZero => String::from("Division by zero"),
+            Error::MissingEqualCharacter => String::from("Missing the character '=' to create a complete comparison operator"),
             Error::UnknownFunctionString => String::from("Unknown function string"),
             Error::ArgumentSqrtIsNegative => String::from("Argument of sqrt function is negative"),
             Error::ArgumentLogIsNegativeOrNull => {

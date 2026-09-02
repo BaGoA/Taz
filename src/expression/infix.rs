@@ -2,7 +2,7 @@ use crate::error::Error;
 use crate::expression::token_iterator::TokenIterator;
 use crate::token::constants::*;
 use crate::token::functions::Function;
-use crate::token::operators::{BinaryOperator, UnaryOperator};
+use crate::token::operators::{BinaryOperator, ComparisonOperator, UnaryOperator};
 use crate::token::Token;
 
 use std::iter::Peekable;
@@ -37,7 +37,7 @@ fn extract_if(
 }
 
 /// Extract a number from string given by user via its char iterator
-/// If we don't find a number, we return an error message in Err of the result.
+/// If we don't find a number, we return an error in Result output.
 fn extract_number(chars_iterator: &mut Peekable<Chars<'_>>) -> Result<f64, Error> {
     let str_number: String = extract_if(chars_iterator, |c: char| c.is_digit(10) || c == '.');
 
@@ -49,6 +49,39 @@ fn extract_number(chars_iterator: &mut Peekable<Chars<'_>>) -> Result<f64, Error
 /// Extract a word from string given by user via its char iterator
 fn extract_word(chars_iterator: &mut Peekable<Chars<'_>>) -> String {
     return extract_if(chars_iterator, |c: char| c.is_alphanumeric() || c == '_');
+}
+
+/// Extract a string corresponding to comparison operator from string given by user via its char iterator
+/// If we don't find a comparison operator, we return an error in Result output
+fn extract_comparison_operator(chars_iterator: &mut Peekable<Chars<'_>>) -> Result<String, Error> {
+    let mut ops_str: String = String::with_capacity(2);
+
+    match chars_iterator.peek() {
+        Some(c) => {
+            if ComparisonOperator::is_ops(*c) {
+                ops_str.push(*c);
+                chars_iterator.next();
+            }
+        }
+        None => (),
+    }
+
+    if !ops_str.is_empty() {
+        match chars_iterator.peek() {
+            Some(c) => {
+                if *c == '=' {
+                    ops_str.push(*c);
+                    chars_iterator.next();
+                } else if ops_str.contains('=') || ops_str.contains('!') {
+                    // The operator == and != need to have the character '='
+                    return Err(Error::MissingEqualCharacter);
+                }
+            }
+            None => (),
+        }
+    }
+
+    return Ok(ops_str);
 }
 
 /// Skip the whitespace in chars iterator
@@ -110,6 +143,15 @@ impl TokenIterator for Infix<'_> {
                     };
 
                     self.chars_iterator.next();
+                } else if ComparisonOperator::is_ops(*c) {
+                    match extract_comparison_operator(self.chars_iterator.by_ref()) {
+                        Ok(ops_str) => {
+                            next_token = Token::new_comparison_ops(ops_str.as_str());
+                        }
+                        Err(err) => {
+                            next_token = Err(err);
+                        }
+                    }
                 } else if *c == '(' {
                     next_token = Ok(Token::LeftParenthesis);
                     self.chars_iterator.next();

@@ -166,15 +166,13 @@ impl ComparisonOperator {
         }
     }
 
-    /// Check if a string corresponds to comparison operator
-    pub fn is_ops(ops: &str) -> bool {
+    /// Check if a char corresponds to comparison operator
+    pub fn is_ops(ops: char) -> bool {
         match ops {
-            "<" => true,
-            "<=" => true,
-            ">" => true,
-            ">=" => true,
-            "==" => true,
-            "!=" => true,
+            '<' => true,
+            '>' => true,
+            '=' => true,
+            '!' => true,
             _ => false,
         }
     }
@@ -516,13 +514,11 @@ mod tests {
 
     #[test]
     fn test_comparison_operator_is_ops() {
-        assert!(ComparisonOperator::is_ops("<"));
-        assert!(ComparisonOperator::is_ops("<="));
-        assert!(ComparisonOperator::is_ops(">"));
-        assert!(ComparisonOperator::is_ops(">="));
-        assert!(ComparisonOperator::is_ops("=="));
-        assert!(ComparisonOperator::is_ops("!="));
-        assert!(!ComparisonOperator::is_ops("-"));
+        assert!(ComparisonOperator::is_ops('<'));
+        assert!(ComparisonOperator::is_ops('>'));
+        assert!(ComparisonOperator::is_ops('='));
+        assert!(ComparisonOperator::is_ops('!'));
+        assert!(!ComparisonOperator::is_ops('-'));
     }
 
     #[test]
