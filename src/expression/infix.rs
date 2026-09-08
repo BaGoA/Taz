@@ -497,4 +497,64 @@ mod tests {
             Err(_) => assert!(false),
         }
     }
+
+    #[test]
+    fn test_infix_expression_with_numbers_comparaison_operator() {
+        let expression: &str = "43.75 < 20.97";
+        let left_number_ref: f64 = 43.75;
+        let right_number_ref: f64 = 20.97;
+
+        let tokens: Vec<Token> = vec![
+            Token::Number(left_number_ref),
+            Token::ComparisonOperator(ComparisonOperator::Lower),
+            Token::Number(right_number_ref),
+        ];
+
+        let infix = Infix::new(expression);
+
+        match infix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_infix_expression_with_numbers_comparaison_operator_associated_with_equal() {
+        let expression: &str = "43.75 >= 20.97";
+        let left_number_ref: f64 = 43.75;
+        let right_number_ref: f64 = 20.97;
+
+        let tokens: Vec<Token> = vec![
+            Token::Number(left_number_ref),
+            Token::ComparisonOperator(ComparisonOperator::GreaterEqual),
+            Token::Number(right_number_ref),
+        ];
+
+        let infix = Infix::new(expression);
+
+        match infix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_infix_expression_with_numbers_wrong_comparaison_operator() {
+        let expression: &str = "43.75 = 20.97";
+        let left_number_ref: f64 = 43.75;
+        let right_number_ref: f64 = 20.97;
+
+        let tokens: Vec<Token> = vec![
+            Token::Number(left_number_ref),
+            Token::ComparisonOperator(ComparisonOperator::Equal),
+            Token::Number(right_number_ref),
+        ];
+
+        let infix = Infix::new(expression);
+
+        match infix.equal(tokens.as_slice()) {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::MissingEqualCharacter),
+        }
+    }
 }
