@@ -31,6 +31,8 @@ pub enum Error {
     MissingLeftOperandForBinaryOperator,
     MissingRightOperandForBinaryOperator,
     MissingOperandForUnaryOperator,
+    MissingLeftOperandForComparisonOperator,
+    MissingRightOperandForComparisonOperator,
     MissingArgumentForFunction,
     UnacceptableToken,
 }
@@ -67,6 +69,8 @@ impl Error {
             Error::MissingLeftOperandForBinaryOperator => String::from("Missing left operand to apply binary operation"),
             Error::MissingRightOperandForBinaryOperator => String::from("Missing right operand to apply binary operation"),
             Error::MissingOperandForUnaryOperator => String::from("Missing operand to apply unary operation"),
+            Error::MissingLeftOperandForComparisonOperator => String::from("Missing left operand to apply comparison operation"),
+            Error::MissingRightOperandForComparisonOperator => String::from("Missing right operand to apply comparison operation"),
             Error::MissingArgumentForFunction => String::from("Missing argument to apply function"),
             Error::UnacceptableToken => String::from("Token non-accepted for evaluation of postfix expression"),
         }
