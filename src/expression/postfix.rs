@@ -1,22 +1,32 @@
 use crate::error::Error;
 use crate::expression::token_iterator::TokenIterator;
-use crate::token::operators::BinaryOperator;
+use crate::token::operators::Operator;
 use crate::token::Token;
 
-/// Check if last token, which can represent an operator or left parenthesis, is primary
-/// with binary operator given in argument
-fn last_operator_is_primary(token_ops: Token, current_ops: BinaryOperator) -> bool {
-    match token_ops {
-        Token::UnaryOperator(_) => true,
-        Token::BinaryOperator(last_ops) => {
-            let last_precedence: u8 = last_ops.precedence();
-            let current_precedence: u8 = current_ops.precedence();
+/// Check if previous operator is primary with current operator
+fn previous_operator_is_primary(previous_ops: impl Operator, current_ops: impl Operator) -> bool {
+    let last_precedence: u8 = previous_ops.precedence();
+    let current_precedence: u8 = current_ops.precedence();
 
-            let is_primary: bool = last_precedence > current_precedence;
-            let is_left_associativity: bool =
-                (last_precedence == current_precedence) && current_ops.is_left_associative();
+    let is_primary: bool = last_precedence > current_precedence;
+    let is_left_associativity: bool =
+        (last_precedence == current_precedence) && current_ops.is_left_associative();
 
-            return is_primary || is_left_associativity;
+    return is_primary || is_left_associativity;
+}
+
+/// Check if previous token, which can represent an operator or left parenthesis, is primary
+/// with an operator given in argument
+fn previous_token_is_primary(previous_token: Token, current_ops: impl Operator) -> bool {
+    match previous_token {
+        Token::UnaryOperator(previous_ops) => {
+            previous_operator_is_primary(previous_ops, current_ops)
+        }
+        Token::BinaryOperator(previous_ops) => {
+            previous_operator_is_primary(previous_ops, current_ops)
+        }
+        Token::ComparisonOperator(previous_ops) => {
+            previous_operator_is_primary(previous_ops, current_ops)
         }
         _ => false,
     }
@@ -44,6 +54,19 @@ where
             primary_operator: Vec::with_capacity(25),
         };
     }
+
+    /// Register primary operators from stacked operator
+    /// with higher precedence than operator given in argument
+    fn register_primary_operator(&mut self, ops: impl Operator + Copy) {
+        while let Some(&stack_last) = self.stack_operator.last() {
+            if previous_token_is_primary(stack_last, ops) {
+                self.primary_operator.push(stack_last);
+                self.stack_operator.pop();
+            } else {
+                break;
+            }
+        }
+    }
 }
 
 impl<T> TokenIterator for Postfix<T>
@@ -64,18 +87,15 @@ where
             Token::Number(_) => return Ok(infix_token),
             Token::Constant(_) => return Ok(infix_token),
             Token::BinaryOperator(ops) => {
-                // Pop stack operator according to last operators precedence
-                // Then fill the primary operator container to return it at next calls
-                while let Some(&stack_last) = self.stack_operator.last() {
-                    if last_operator_is_primary(stack_last, ops) {
-                        self.primary_operator.push(stack_last);
-                        self.stack_operator.pop();
-                    } else {
-                        break;
-                    }
-                }
-
+                self.register_primary_operator(ops);
                 self.stack_operator.push(infix_token);
+
+                return Ok(Token::Empty);
+            }
+            Token::ComparisonOperator(ops) => {
+                self.register_primary_operator(ops);
+                self.stack_operator.push(infix_token);
+
                 return Ok(Token::Empty);
             }
             Token::UnaryOperator(_) => {
@@ -123,14 +143,15 @@ where
             }
             _ => {
                 // Push rest of operator. If stack operator contains left parenthesis, then there is an error
-                if self.stack_operator.is_empty() {
-                    return Ok(Token::Stop);
-                } else {
-                    if self.stack_operator.contains(&Token::LeftParenthesis) {
-                        return Err(Error::MismatchedParenthesis);
-                    }
+                match self.stack_operator.pop() {
+                    Some(token) => {
+                        if self.stack_operator.contains(&Token::LeftParenthesis) {
+                            return Err(Error::MismatchedParenthesis);
+                        }
 
-                    return Ok(self.stack_operator.pop().unwrap());
+                        return Ok(token);
+                    }
+                    None => return Ok(Token::Stop),
                 }
             }
         }
@@ -141,7 +162,11 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::token::{constants, functions::Function, operators::UnaryOperator};
+    use crate::token::{
+        constants,
+        functions::Function,
+        operators::{BinaryOperator, ComparisonOperator, UnaryOperator},
+    };
 
     // Mock infix iterator from vector of token
     struct MockInfix<'a> {
@@ -593,5 +618,100 @@ mod tests {
         }
 
         assert!(result_token.is_err());
+    }
+
+    #[test]
+    fn test_postfix_expression_with_numbers_lower_operator() {
+        let mut infix_tokens: Vec<Token> = vec![
+            Token::Number(2.0),
+            Token::ComparisonOperator(ComparisonOperator::Lower),
+            Token::Number(3.0),
+        ];
+
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
+
+        let tokens: Vec<Token> = vec![
+            Token::Number(2.0),
+            Token::Number(3.0),
+            Token::ComparisonOperator(ComparisonOperator::Lower),
+        ];
+
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_postfix_expression_with_numbers_plus_operators_not_equal_operator() {
+        let mut infix_tokens: Vec<Token> = vec![
+            Token::Number(8.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(9.0),
+            Token::ComparisonOperator(ComparisonOperator::NotEqual),
+            Token::Number(2.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(3.0),
+        ];
+
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
+
+        let tokens: Vec<Token> = vec![
+            Token::Number(8.0),
+            Token::Number(9.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(2.0),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::ComparisonOperator(ComparisonOperator::NotEqual),
+        ];
+
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_postfix_expression_with_numbers_multiply_operator_minus_unary_operator_comparison_operators_parenthesis(
+    ) {
+        let mut infix_tokens: Vec<Token> = vec![
+            Token::LeftParenthesis,
+            Token::Number(8.0),
+            Token::ComparisonOperator(ComparisonOperator::Greater),
+            Token::Number(2.0),
+            Token::RightParenthesis,
+            Token::BinaryOperator(BinaryOperator::Multiply),
+            Token::LeftParenthesis,
+            Token::UnaryOperator(UnaryOperator::Minus),
+            Token::Number(9.0),
+            Token::ComparisonOperator(ComparisonOperator::LowerEqual),
+            Token::Number(3.0),
+            Token::RightParenthesis,
+        ];
+
+        let postfix = Postfix::new(MockInfix::new(&mut infix_tokens)).filter(|token: Token| {
+            return token != Token::Empty;
+        });
+
+        let tokens: Vec<Token> = vec![
+            Token::Number(8.0),
+            Token::Number(2.0),
+            Token::ComparisonOperator(ComparisonOperator::Greater),
+            Token::Number(9.0),
+            Token::UnaryOperator(UnaryOperator::Minus),
+            Token::Number(3.0),
+            Token::ComparisonOperator(ComparisonOperator::LowerEqual),
+            Token::BinaryOperator(BinaryOperator::Multiply),
+        ];
+
+        match postfix.equal(tokens.as_slice()) {
+            Ok(are_equal) => assert!(are_equal),
+            Err(_) => assert!(false),
+        }
     }
 }

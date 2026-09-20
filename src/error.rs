@@ -7,7 +7,9 @@ pub enum Error {
     // operators
     UnknownBinaryOperatorCharacter,
     UnknownUnaryOperatorCharacter,
+    UnknownComparisonOperatorString,
     DivisionByZero,
+    MissingEqualCharacter,
 
     // functions
     UnknownFunctionString,
@@ -29,6 +31,8 @@ pub enum Error {
     MissingLeftOperandForBinaryOperator,
     MissingRightOperandForBinaryOperator,
     MissingOperandForUnaryOperator,
+    MissingLeftOperandForComparisonOperator,
+    MissingRightOperandForComparisonOperator,
     MissingArgumentForFunction,
     UnacceptableToken,
 }
@@ -43,7 +47,11 @@ impl Error {
             Error::UnknownUnaryOperatorCharacter => {
                 String::from("Unknown unary operator character")
             }
+            Error::UnknownComparisonOperatorString => {
+                String::from("Unknown comparison operator string")
+            }
             Error::DivisionByZero => String::from("Division by zero"),
+            Error::MissingEqualCharacter => String::from("Missing the character '=' to create a complete comparison operator"),
             Error::UnknownFunctionString => String::from("Unknown function string"),
             Error::ArgumentSqrtIsNegative => String::from("Argument of sqrt function is negative"),
             Error::ArgumentLogIsNegativeOrNull => {
@@ -61,6 +69,8 @@ impl Error {
             Error::MissingLeftOperandForBinaryOperator => String::from("Missing left operand to apply binary operation"),
             Error::MissingRightOperandForBinaryOperator => String::from("Missing right operand to apply binary operation"),
             Error::MissingOperandForUnaryOperator => String::from("Missing operand to apply unary operation"),
+            Error::MissingLeftOperandForComparisonOperator => String::from("Missing left operand to apply comparison operation"),
+            Error::MissingRightOperandForComparisonOperator => String::from("Missing right operand to apply comparison operation"),
             Error::MissingArgumentForFunction => String::from("Missing argument to apply function"),
             Error::UnacceptableToken => String::from("Token non-accepted for evaluation of postfix expression"),
         }

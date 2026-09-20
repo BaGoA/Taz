@@ -30,6 +30,17 @@ pub fn evaluate(mut postfix_iterator: impl TokenIterator) -> Result<f64, Error> 
                     return Err(Error::MissingOperandForUnaryOperator);
                 }
             }
+            Token::ComparisonOperator(ops) => {
+                if let Some(right) = stack_operand.pop() {
+                    if let Some(left) = stack_operand.pop() {
+                        stack_operand.push(ops.apply(left, right)?);
+                    } else {
+                        return Err(Error::MissingLeftOperandForComparisonOperator);
+                    }
+                } else {
+                    return Err(Error::MissingRightOperandForComparisonOperator);
+                }
+            }
             Token::Function(fun) => {
                 if let Some(arg) = stack_operand.pop() {
                     stack_operand.push(fun.apply(arg)?);
@@ -57,7 +68,7 @@ mod tests {
     use crate::token::{
         constants::PI,
         functions::Function,
-        operators::{BinaryOperator, UnaryOperator},
+        operators::{BinaryOperator, ComparisonOperator, UnaryOperator},
     };
 
     fn relative_error(value: f64, reference: f64) -> f64 {
@@ -307,6 +318,66 @@ mod tests {
         match postfix_evaluation(&mut tokens) {
             Ok(result) => {
                 let result_ref: f64 = -1.0;
+                assert!(relative_error(result, result_ref) < 0.01)
+            }
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_postfix_evaluation_with_numbers_comparison_operator() {
+        let mut tokens: Vec<Token> = vec![
+            Token::Number(2.0),
+            Token::Number(3.0),
+            Token::ComparisonOperator(ComparisonOperator::Lower),
+        ];
+
+        match postfix_evaluation(&mut tokens) {
+            Ok(result) => {
+                let result_ref: f64 = 1.0;
+                assert!(relative_error(result, result_ref) < 0.01)
+            }
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_postfix_evaluation_with_numbers_binary_and_comparison_operators() {
+        let mut tokens: Vec<Token> = vec![
+            Token::Number(8.0),
+            Token::Number(9.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::Number(2.0),
+            Token::Number(3.0),
+            Token::BinaryOperator(BinaryOperator::Plus),
+            Token::ComparisonOperator(ComparisonOperator::NotEqual),
+        ];
+
+        match postfix_evaluation(&mut tokens) {
+            Ok(result) => {
+                let result_ref: f64 = 1.0;
+                assert!(relative_error(result, result_ref) < 0.01)
+            }
+            Err(_) => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_postfix_evaluation_with_numbers_unary_binary_comparison_operators() {
+        let mut tokens: Vec<Token> = vec![
+            Token::Number(8.0),
+            Token::Number(2.0),
+            Token::ComparisonOperator(ComparisonOperator::Greater),
+            Token::Number(9.0),
+            Token::UnaryOperator(UnaryOperator::Minus),
+            Token::Number(3.0),
+            Token::ComparisonOperator(ComparisonOperator::LowerEqual),
+            Token::BinaryOperator(BinaryOperator::Multiply),
+        ];
+
+        match postfix_evaluation(&mut tokens) {
+            Ok(result) => {
+                let result_ref: f64 = 1.0;
                 assert!(relative_error(result, result_ref) < 0.01)
             }
             Err(_) => assert!(false),

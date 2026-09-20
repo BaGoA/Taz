@@ -69,10 +69,54 @@ fn test_evaluation_expression_with_constant_and_number() {
 }
 
 #[test]
-fn test_evaluation_expression_with_all() {
+fn test_evaluation_expression_with_all_except_comparison() {
     let expression: String = String::from("sin(2.0 - pi) * cos((-pi + 2.0) / 2.0)");
     let reference: f64 =
         (2.0 - std::f64::consts::PI).sin() * ((-std::f64::consts::PI + 2.0) / 2.0).cos();
+
+    match taz::evaluate(expression.as_str()) {
+        Ok(result) => assert!(relative_error(result, reference) < 0.01),
+        Err(_) => assert!(false),
+    }
+}
+
+#[test]
+fn test_evaluation_expression_with_number_constant_comparison_operator() {
+    let expression: String = String::from("pi <= 2.0");
+    let reference: f64 = 0.0;
+
+    match taz::evaluate(expression.as_str()) {
+        Ok(result) => assert!(relative_error(result, reference) < 0.01),
+        Err(_) => assert!(false),
+    }
+}
+
+#[test]
+fn test_evaluation_expression_with_number_function_constant_comparison_operator() {
+    let expression: String = String::from("sin(pi) != 2.0");
+    let reference: f64 = 1.0;
+
+    match taz::evaluate(expression.as_str()) {
+        Ok(result) => assert!(relative_error(result, reference) < 0.01),
+        Err(_) => assert!(false),
+    }
+}
+
+#[test]
+fn test_evaluation_expression_with_comparison_between_two_expressions() {
+    let expression: String = String::from("sin(pi/4)^2 + cos(pi/4)^2 > 4.23 * (2.98 - 5.54)");
+    let reference: f64 = 1.0;
+
+    match taz::evaluate(expression.as_str()) {
+        Ok(result) => assert!(relative_error(result, reference) < 0.01),
+        Err(_) => assert!(false),
+    }
+}
+
+#[test]
+fn test_evaluation_expression_with_comparison_operator_incluided_in_expression() {
+    let expression: String = String::from("2.0 + (cos(pi/4) < 1.0) * 2.0");
+    let reference: f64 = 4.0;
 
     match taz::evaluate(expression.as_str()) {
         Ok(result) => assert!(relative_error(result, reference) < 0.01),

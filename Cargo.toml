@@ -1,8 +1,8 @@
 [package]
 name = "taz"
-version = "2.1.0"
+version = "2.2.0"
 authors = ["Bastian Gonzalez Acevedo <bastiangonzalezacevedo@gmail.com>"]
-edition = "2021"
+edition = "2024"
 license-file = "LICENSE"
 description = "Taz is Rust library to evaluate a mathematical expression"
 repository = "https://github.com/BaGoA/Taz"

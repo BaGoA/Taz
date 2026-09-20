@@ -159,142 +159,162 @@ mod tests {
 
     #[test]
     fn test_function_from_abs_string() {
-        let res: Result<Function, Error> = Function::from_string("abs");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Abs);
+        match Function::from_string("abs") {
+            Ok(fun) => assert_eq!(fun, Function::Abs),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_sqrt_string() {
-        let res: Result<Function, Error> = Function::from_string("sqrt");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Sqrt);
+        match Function::from_string("sqrt") {
+            Ok(fun) => assert_eq!(fun, Function::Sqrt),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_cbrt_string() {
-        let res: Result<Function, Error> = Function::from_string("cbrt");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Cbrt);
+        match Function::from_string("cbrt") {
+            Ok(fun) => assert_eq!(fun, Function::Cbrt),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_exp_string() {
-        let res: Result<Function, Error> = Function::from_string("exp");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Exp);
+        match Function::from_string("exp") {
+            Ok(fun) => assert_eq!(fun, Function::Exp),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_ln_string() {
-        let res: Result<Function, Error> = Function::from_string("ln");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Ln);
+        match Function::from_string("ln") {
+            Ok(fun) => assert_eq!(fun, Function::Ln),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_log10_string() {
-        let res: Result<Function, Error> = Function::from_string("log10");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Log10);
+        match Function::from_string("log10") {
+            Ok(fun) => assert_eq!(fun, Function::Log10),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_log2_string() {
-        let res: Result<Function, Error> = Function::from_string("log2");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Log2);
+        match Function::from_string("log2") {
+            Ok(fun) => assert_eq!(fun, Function::Log2),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_sin_string() {
-        let res: Result<Function, Error> = Function::from_string("sin");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Sin);
+        match Function::from_string("sin") {
+            Ok(fun) => assert_eq!(fun, Function::Sin),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_cos_string() {
-        let res: Result<Function, Error> = Function::from_string("cos");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Cos);
+        match Function::from_string("cos") {
+            Ok(fun) => assert_eq!(fun, Function::Cos),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_tan_string() {
-        let res: Result<Function, Error> = Function::from_string("tan");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Tan);
+        match Function::from_string("tan") {
+            Ok(fun) => assert_eq!(fun, Function::Tan),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_asin_string() {
-        let res: Result<Function, Error> = Function::from_string("asin");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Asin);
+        match Function::from_string("asin") {
+            Ok(fun) => assert_eq!(fun, Function::Asin),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_acos_string() {
-        let res: Result<Function, Error> = Function::from_string("acos");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Acos);
+        match Function::from_string("acos") {
+            Ok(fun) => assert_eq!(fun, Function::Acos),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_atan_string() {
-        let res: Result<Function, Error> = Function::from_string("atan");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Atan);
+        match Function::from_string("atan") {
+            Ok(fun) => assert_eq!(fun, Function::Atan),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_sinh_string() {
-        let res: Result<Function, Error> = Function::from_string("sinh");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Sinh);
+        match Function::from_string("sinh") {
+            Ok(fun) => assert_eq!(fun, Function::Sinh),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_cosh_string() {
-        let res: Result<Function, Error> = Function::from_string("cosh");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Cosh);
+        match Function::from_string("cosh") {
+            Ok(fun) => assert_eq!(fun, Function::Cosh),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_tanh_string() {
-        let res: Result<Function, Error> = Function::from_string("tanh");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Tanh);
+        match Function::from_string("tanh") {
+            Ok(fun) => assert_eq!(fun, Function::Tanh),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_asinh_string() {
-        let res: Result<Function, Error> = Function::from_string("asinh");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Asinh);
+        match Function::from_string("asinh") {
+            Ok(fun) => assert_eq!(fun, Function::Asinh),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_acosh_string() {
-        let res: Result<Function, Error> = Function::from_string("acosh");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Acosh);
+        match Function::from_string("acosh") {
+            Ok(fun) => assert_eq!(fun, Function::Acosh),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_atanh_string() {
-        let res: Result<Function, Error> = Function::from_string("atanh");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), Function::Atanh);
+        match Function::from_string("atanh") {
+            Ok(fun) => assert_eq!(fun, Function::Atanh),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_from_unknown_string() {
-        let res: Result<Function, Error> = Function::from_string("toto");
-        assert!(res.is_err());
-        assert_eq!(res.err(), Some(Error::UnknownFunctionString));
+        match Function::from_string("toto") {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::UnknownFunctionString),
+        }
     }
 
     #[test]
@@ -325,198 +345,224 @@ mod tests {
     fn test_function_apply_abs() {
         let fun: Function = Function::Abs;
 
-        let res: Result<f64, Error> = fun.apply(-2.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 2.0);
+        match fun.apply(-2.0) {
+            Ok(value) => assert_eq!(value, 2.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_sqrt() {
         let fun: Function = Function::Sqrt;
 
-        let res: Result<f64, Error> = fun.apply(4.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 2.0);
+        match fun.apply(4.0) {
+            Ok(value) => assert_eq!(value, 2.0),
+            Err(_) => assert!(false),
+        }
 
-        let res_in_err: Result<f64, Error> = fun.apply(-4.0);
-        assert!(res_in_err.is_err());
-        assert_eq!(res_in_err.err(), Some(Error::ArgumentSqrtIsNegative));
+        match fun.apply(-4.0) {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::ArgumentSqrtIsNegative),
+        }
     }
 
     #[test]
     fn test_function_apply_cbrt() {
         let fun: Function = Function::Cbrt;
 
-        let res: Result<f64, Error> = fun.apply(-8.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), -2.0);
+        match fun.apply(-8.0) {
+            Ok(value) => assert_eq!(value, -2.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_exp() {
         let fun: Function = Function::Exp;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 1.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 1.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_ln() {
         let fun: Function = Function::Ln;
 
-        let res: Result<f64, Error> = fun.apply(1.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(1.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
 
-        let res_in_err: Result<f64, Error> = fun.apply(-4.0);
-        assert!(res_in_err.is_err());
-        assert_eq!(res_in_err.err(), Some(Error::ArgumentLogIsNegativeOrNull));
+        match fun.apply(-4.0) {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::ArgumentLogIsNegativeOrNull),
+        }
     }
 
     #[test]
     fn test_function_apply_log10() {
         let fun: Function = Function::Log10;
 
-        let res: Result<f64, Error> = fun.apply(10.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 1.0);
+        match fun.apply(10.0) {
+            Ok(value) => assert_eq!(value, 1.0),
+            Err(_) => assert!(false),
+        }
 
-        let res_in_err: Result<f64, Error> = fun.apply(-4.0);
-        assert!(res_in_err.is_err());
-        assert_eq!(res_in_err.err(), Some(Error::ArgumentLogIsNegativeOrNull));
+        match fun.apply(-4.0) {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::ArgumentLogIsNegativeOrNull),
+        }
     }
 
     #[test]
     fn test_function_apply_log2() {
         let fun: Function = Function::Log2;
 
-        let res: Result<f64, Error> = fun.apply(2.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 1.0);
+        match fun.apply(2.0) {
+            Ok(value) => assert_eq!(value, 1.0),
+            Err(_) => assert!(false),
+        }
 
-        let res_in_err: Result<f64, Error> = fun.apply(-4.0);
-        assert!(res_in_err.is_err());
-        assert_eq!(res_in_err.err(), Some(Error::ArgumentLogIsNegativeOrNull));
+        match fun.apply(-4.0) {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::ArgumentLogIsNegativeOrNull),
+        }
     }
 
     #[test]
     fn test_function_apply_sin() {
         let fun: Function = Function::Sin;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_cos() {
         let fun: Function = Function::Cos;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 1.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 1.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_tan() {
         let fun: Function = Function::Tan;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
 
-        let res_in_err: Result<f64, Error> = fun.apply(std::f64::consts::FRAC_PI_2);
-        assert!(res_in_err.is_err());
-        assert_eq!(res_in_err.err(), Some(Error::ArgumentTanIsInvalid));
+        match fun.apply(std::f64::consts::FRAC_PI_2) {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::ArgumentTanIsInvalid),
+        }
     }
 
     #[test]
     fn test_function_apply_asin() {
         let fun: Function = Function::Asin;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
 
-        let res_in_err: Result<f64, Error> = fun.apply(1.8);
-        assert!(res_in_err.is_err());
-        assert_eq!(res_in_err.err(), Some(Error::ArgumentASinIsInvalid));
+        match fun.apply(1.8) {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::ArgumentASinIsInvalid),
+        }
     }
 
     #[test]
     fn test_function_apply_acos() {
         let fun: Function = Function::Acos;
 
-        let res: Result<f64, Error> = fun.apply(1.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(1.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
 
-        let res_in_err: Result<f64, Error> = fun.apply(1.8);
-        assert!(res_in_err.is_err());
-        assert_eq!(res_in_err.err(), Some(Error::ArgumentACosIsInvalid));
+        match fun.apply(1.8) {
+            Ok(_) => assert!(false),
+            Err(err) => assert_eq!(err, Error::ArgumentACosIsInvalid),
+        }
     }
 
     #[test]
     fn test_function_apply_atan() {
         let fun: Function = Function::Atan;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_sinh() {
         let fun: Function = Function::Sinh;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_cosh() {
         let fun: Function = Function::Cosh;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 1.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 1.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_tanh() {
         let fun: Function = Function::Tanh;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_asinh() {
         let fun: Function = Function::Asinh;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_acosh() {
         let fun: Function = Function::Acosh;
 
-        let res: Result<f64, Error> = fun.apply(1.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(1.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
     }
 
     #[test]
     fn test_function_apply_atanh() {
         let fun: Function = Function::Atanh;
 
-        let res: Result<f64, Error> = fun.apply(0.0);
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), 0.0);
+        match fun.apply(0.0) {
+            Ok(value) => assert_eq!(value, 0.0),
+            Err(_) => assert!(false),
+        }
     }
 }
