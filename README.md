@@ -34,7 +34,10 @@ Then, we convert this infix expression into postfix expression. Indeed an evalua
 
 Finally we evaluate the posfix expression by stack method.
 
-In this expression we can use following predefined constant:
+The expression can include unary operators (+, -), binary operators (+, -, *, / and ^ for power) and comparison operators (<, <=, >, >=, ==, !=).
+Note that the evaluation of comparison operation return 1.0 for true and 0.0 for false.
+
+In this expression, we can use following predefined constant:
 - pi: The constant pi
 - e: The exponential constant
 - c: The speed of light constant
